@@ -1,21 +1,33 @@
+/* global mathjs:true */
+
 'use strict';
 
 (function() {
-  var widgetsHeights = [3, 2, 5, 1, 1, 4, 3, 6, 2, 4, 2, 4, 3, 2, 1],
+  var widgetsHeights = [3, 2, 5, 1, 1, 4, 3, 6, 2, 4, 2, 4, 3, 2, 1, 5, 1, 1, 4, 3, 6, 2, 4],
       COLUMN_WIDTH = 250,
       MARGIN = 15,
-      ROW_HEIGHT = 40,
+      ROW_HEIGHT = 50,
       $container = $('#container'),
       widgets = new Array(widgetsHeights.length),
-      DISTANCE_COEFF = 100,
-
+      DISTANCE_COEFF = 500,
+      math = mathjs(),
+ 
   computeNrOfColumns = function() {
-    return Math.floor(($container.width() + MARGIN) / (COLUMN_WIDTH + MARGIN));
+    var nr = Math.floor(($container.width() + MARGIN) / (COLUMN_WIDTH + MARGIN));
+    if (nr < 1) {
+      nr = 1;
+    }
+    return nr;
   },
   nrOfColumns = computeNrOfColumns(),
 
   computeWeight = function(widget, column) {
-    var normCol = column / nrOfColumns;
+    var normCol;
+    if (nrOfColumns === 1) {
+      normCol = column;
+    } else {
+      normCol = column / (nrOfColumns-1);
+    }
     return widget.prio + Math.abs(widget.pos - normCol) * DISTANCE_COEFF;
   },
 
@@ -72,12 +84,13 @@
       if (updatePrios) {
         widgetToInsert.prio = free[colToInsert];
         widgetToInsert.pos = colToInsert / (nrOfColumns - 1);
+        widgetToInsert.dom.attr('data-col', colToInsert);
       }
 
       $('.info', widgetToInsert.dom).text(
         'prio: ' + widgetToInsert.prio +
-        ' / pos: ' + widgetToInsert.pos +
-        ' / weight: ' + Math.round(100*minWeight) / 100
+        ' / pos: ' + math.round(widgetToInsert.pos, 2) +
+        ' / weight: ' + math.round(minWeight, 2)
       );
 
       free[colToInsert] += (MARGIN + widgetToInsert.dom.height());
@@ -87,7 +100,9 @@
 
   $(function() {
     $.each(widgetsHeights, function(i, v) {
-      var $widget = $('<div class="widget"><div class="name">' + i + '</div><div class="info"/></div>');
+      var $widget = $(
+        '<div class="widget"><div class="dragarea"><p>' + i + '</p></div><div class="info"/></div>'
+      );
       $widget.height(ROW_HEIGHT * v);
       widgets[i] = {
         prio: i,
