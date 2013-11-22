@@ -1,9 +1,11 @@
+/* global hammertime:true */
+
 'use strict';
 
 (function() {
 
-  window.createDashboardDragNDrop = function(container, widget, dragArea) {
-    var 
+  window.createDragNDrop = function(container, widget, dragArea) {
+    var
     that, // instance created by this factory
     DOCUMENT = jQuery(document), // jQuery Document object
     originX, originY, // position of widget before dragging
@@ -122,7 +124,7 @@
       mouseX = baseMouseX = ev.pageX;
       mouseY = baseMouseY = ev.pageY;
       
-      DOCUMENT.on('mousemove', mouseDrag); 
+      DOCUMENT.on('mousemove', mouseDrag);
       DOCUMENT.on('mouseup', mouseDrop);
       
       prepareForDrag();
@@ -135,7 +137,7 @@
       mouseX = baseMouseX = ev.gesture.center.pageX;
       mouseY = baseMouseY = ev.gesture.center.pageY;
       
-      hammertime.on('drag', touchDrag); 
+      hammertime.on('drag', touchDrag);
       hammertime.on('release', touchDrop);
       
       prepareForDrag();
@@ -200,21 +202,21 @@
         if (window.ontouchstart !== undefined) {
           // for touch
           hammertime = dragArea.hammer({
-            transform_always_block: true,
-            transform_min_scale: 1,
-            drag_block_horizontal: true,
-            drag_block_vertical: true,
-            drag_min_distance: 0,
-            hold_timeout: 300,
-            prevent_mouseevents: true
+            'transform_always_block': true,
+            'transform_min_scale': 1,
+            'drag_block_horizontal': true,
+            'drag_block_vertical': true,
+            'drag_min_distance': 0,
+            'hold_timeout': 300,
+            'prevent_mouseevents': true
           });
           
-          hammertime.on("hold", function(ev) {
+          hammertime.on('hold', function(ev) {
             prepareForTouchDrag(ev);
           });
         } else {
           // for non-touch
-          dragArea.on("mousedown", function(ev) {
+          dragArea.on('mousedown', function(ev) {
             prepareForMouseDrag(ev);
           });
         }

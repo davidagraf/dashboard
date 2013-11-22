@@ -9,6 +9,11 @@ $icon-font-path: "/bower_components/sass-bootstrap/fonts/";
     padding: 0.2em 0;
 }
 
+.noselect {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 #container {
   width: 100%;
   position: relative;
@@ -49,6 +54,9 @@ $icon-font-path: "/bower_components/sass-bootstrap/fonts/";
   &:not(.dragging) {
     -webkit-transition: top $time-move ease, left $time-move ease, opacity $time-move ease-out;
   }
+  &.dragging {
+    z-index: 100;
+  }
 
   .dragarea {
     background-color: rgba(0, 0, 0, 0.2);
@@ -56,8 +64,6 @@ $icon-font-path: "/bower_components/sass-bootstrap/fonts/";
 
     &:hover {
       cursor: move;
-      user-select: none;
-      -webkit-user-select: none;
     }
   }
 }

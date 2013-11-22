@@ -96,19 +96,44 @@
       free[colToInsert] += (MARGIN + widgetToInsert.dom.height());
     }
 
+    $container.height(math.max(free));
+
+  },
+  
+  createDragNDropHandler = function($widget) {
+    var offset;
+    return {
+      prepareForDrag: function(dragNDrop) {
+        offset = $widget.offset();
+        $widget.addClass('dragging');
+        $('body').addClass('noselect');
+      },
+      prepareForDrop: function(dragNDrop) {
+        $widget.removeClass('dragging');
+        $('body').removeClass('noselect');
+        $widget.offset(offset);
+      }
+    };
   };
 
   $(function() {
     $.each(widgetsHeights, function(i, v) {
-      var $widget = $(
-        '<div class="widget"><div class="dragarea"><p>' + i + '</p></div><div class="info"/></div>'
-      );
+      var dragNDrop,
+          $widget = $(
+            '<div class="widget"><div class="dragarea"><p>' + i + '</p></div><div class="info"/></div>'
+          );
+
       $widget.height(ROW_HEIGHT * v);
       widgets[i] = {
         prio: i,
         pos: 0,
         dom: $widget
       };
+
+      dragNDrop = window.createDragNDrop($container, $widget, $('.dragarea', $widget));
+      dragNDrop.setHandler(createDragNDropHandler($widget));
+      dragNDrop.init();
+
       $container.append($widget);
     });
     positionWidgets(true, true);
