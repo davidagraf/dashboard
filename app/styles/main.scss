@@ -11,9 +11,13 @@ $icon-font-path: "/bower_components/sass-bootstrap/fonts/";
 
 #container {
   width: 100%;
+  position: relative;
 }
 
 .widget {
-  width: 200px;
-  background-color: red;
+  width: 250px;
+  background-color: #E64747;
+  text-align: center;
+  position: absolute;
+  font-size: 15px;
 }
