@@ -28,7 +28,7 @@
     } else {
       normCol = column / (nrOfColumns-1);
     }
-    return widget.prio + Math.abs(widget.pos - normCol) * DISTANCE_COEFF;
+    return widget.top + Math.abs(widget.right - normCol) * DISTANCE_COEFF;
   },
 
   positionWidgets = function(updatePrios, noWeights) {
@@ -42,9 +42,9 @@
     
     widgetsClone.sort(
       function(a, b) {
-        if (a.prio > b.prio) {
+        if (a.top > b.top) {
           return 1;
-        } else if (a.prio < b.prio) {
+        } else if (a.top < b.top) {
           return -1;
         } else {
           return 0;
@@ -57,11 +57,11 @@
 
       if (noWeights) {
         widgetToInsert = widgetsClone.splice(0, 1)[0];
-        minWeight = widgetToInsert.prio;
+        minWeight = widgetToInsert.top;
       } else {
         i = j = 0;
         minWeight = computeWeight(widgetsClone[i], colToInsert);
-        while(++i < widgetsClone.length && widgetsClone[i].prio < minWeight) {
+        while(++i < widgetsClone.length && widgetsClone[i].top < minWeight) {
           nextWeight = computeWeight(widgetsClone[i], colToInsert);
           if (nextWeight < minWeight) {
             j = i;
@@ -82,14 +82,14 @@
       });
 
       if (updatePrios) {
-        widgetToInsert.prio = free[colToInsert];
-        widgetToInsert.pos = colToInsert / (nrOfColumns - 1);
+        widgetToInsert.top = free[colToInsert];
+        widgetToInsert.right = colToInsert / (nrOfColumns - 1);
         widgetToInsert.dom.attr('data-col', colToInsert);
       }
 
       $('.info', widgetToInsert.dom).text(
-        'prio: ' + widgetToInsert.prio +
-        ' / pos: ' + math.round(widgetToInsert.pos, 2) +
+        'top: ' + widgetToInsert.top +
+        ' / right: ' + math.round(widgetToInsert.right, 2) +
         ' / weight: ' + math.round(minWeight, 2)
       );
 
@@ -125,8 +125,8 @@
 
       $widget.height(ROW_HEIGHT * v);
       widgets[i] = {
-        prio: i,
-        pos: 0,
+        top: i,
+        right: 0,
         dom: $widget
       };
 
