@@ -9,8 +9,9 @@
       ROW_HEIGHT = 50,
       $container = $('#container'),
       widgets = new Array(widgetsHeights.length),
-      DISTANCE_COEFF = 500,
+      HORIZONTAL_VERTICAL_COEFF = 1,
       math = mathjs(),
+      sumWidgetHeights = 0,
  
   computeNrOfColumns = function() {
     var nr = Math.floor(($container.width() + MARGIN) / (COLUMN_WIDTH + MARGIN));
@@ -21,82 +22,82 @@
   },
   nrOfColumns = computeNrOfColumns(),
 
-  computeWeight = function(widget, column) {
-    var normCol;
-    if (nrOfColumns === 1) {
-      normCol = column;
-    } else {
-      normCol = column / (nrOfColumns-1);
-    }
-    return widget.top + Math.abs(widget.right - normCol) * DISTANCE_COEFF;
-  },
-
-  positionWidgets = function(updatePrios, noWeights) {
+  positionWidgets = function(updatePrios) {
     var free = new Array(nrOfColumns),
         widgetsClone = widgets.slice(0),
-        colToInsert, widgetToInsert, left, i, j, minWeight, nextWeight;
+        potentialToInsert, widgetToInsert,
+        verticalNormalizer = nrOfColumns / sumWidgetHeights,
+        horizontalNormalizer = 1 / (nrOfColumns - 1),
+        max;
+
+    console.log('Repositioning with ' + nrOfColumns + ' columns.');
 
     $.each(free, function(i) {
-      free[i] = 0;
+      free[i] = {
+        top: 0,
+      };
     });
-    
-    widgetsClone.sort(
-      function(a, b) {
-        if (a.top > b.top) {
-          return 1;
-        } else if (a.top < b.top) {
-          return -1;
-        } else {
-          return 0;
-        }
-      }
-    );
 
     while (widgetsClone.length > 0) {
-      colToInsert = free.indexOf(Math.min.apply(Math, free));
 
-      if (noWeights) {
-        widgetToInsert = widgetsClone.splice(0, 1)[0];
-        minWeight = widgetToInsert.top;
-      } else {
-        i = j = 0;
-        minWeight = computeWeight(widgetsClone[i], colToInsert);
-        while(++i < widgetsClone.length && widgetsClone[i].top < minWeight) {
-          nextWeight = computeWeight(widgetsClone[i], colToInsert);
-          if (nextWeight < minWeight) {
-            j = i;
-            minWeight = nextWeight;
+      $.each(free, function(i, v) {
+        v.weight = Infinity;
+      });
+    
+      $.each(free, function(i, v) {
+        var normRight = i * horizontalNormalizer;
+        $.each(widgetsClone, function(j, w) {
+          var weight = w.top * HORIZONTAL_VERTICAL_COEFF +
+                       math.round(math.abs(normRight - w.right), 6); //rounding to avoid rounding error of javascript
+          if (weight < v.weight) {
+            v.weight = weight;
+            v.index = j;
           }
-        }
-        widgetToInsert = widgetsClone.splice(j, 1)[0];
-      }
+        });
+      });
 
-      if (colToInsert === 0) {
-        left = 0;
-      } else {
-        left = colToInsert * (COLUMN_WIDTH + MARGIN);
-      }
+      potentialToInsert = {
+        top: Infinity,
+        weight: Infinity
+      };
+
+      $.each(free, function(i, v) {
+        if (potentialToInsert.weight > v.weight || potentialToInsert.top > v.top) {
+          potentialToInsert = v;
+          potentialToInsert.col = i;
+        }
+      });
+
+      widgetToInsert = widgetsClone.splice(potentialToInsert.index, 1)[0];
+
       widgetToInsert.dom.css({
-        top: free[colToInsert],
-        left: left
+        top: potentialToInsert.top,
+        left: potentialToInsert.col * (COLUMN_WIDTH + MARGIN)
       });
 
       if (updatePrios) {
-        widgetToInsert.top = free[colToInsert];
-        widgetToInsert.right = colToInsert / (nrOfColumns - 1);
-        widgetToInsert.dom.attr('data-col', colToInsert);
+        widgetToInsert.top = potentialToInsert.top * verticalNormalizer;
+        widgetToInsert.right = potentialToInsert.col * horizontalNormalizer;
+        widgetToInsert.dom.attr('data-col', potentialToInsert.col);
       }
 
       $('.info', widgetToInsert.dom).text(
-        'top: ' + widgetToInsert.top +
+        'top: ' + math.round(widgetToInsert.top, 2) +
         ' / right: ' + math.round(widgetToInsert.right, 2) +
-        ' / weight: ' + math.round(minWeight, 2)
+        ' / weight: ' + math.round(potentialToInsert.weight, 2)
       );
 
-      free[colToInsert] += (MARGIN + widgetToInsert.dom.height());
+      potentialToInsert.top += (MARGIN + widgetToInsert.dom.height());
+
     }
 
-    $container.height(math.max(free));
+    max = -1;
+    $.each(free, function(i, v) {
+      if (max < v.top) {
+        max = v.top;
+      }
+    });
+    $container.height(max);
 
   },
   
@@ -125,7 +126,7 @@
 
       $widget.height(ROW_HEIGHT * v);
       widgets[i] = {
-        top: i,
+        top: 0,
         right: 0,
         dom: $widget
       };
@@ -135,8 +136,9 @@
       dragNDrop.init();
 
       $container.append($widget);
+      sumWidgetHeights += ($widget.height() + MARGIN);
     });
-    positionWidgets(true, true);
+    positionWidgets(true);
 
     $(window).resize(function() {
       var curColumns = computeNrOfColumns();
