@@ -2,10 +2,10 @@
   "name": "posdemo",
   "version": "0.0.0",
   "dependencies": {
-    "sass-bootstrap": "~3.0.0",
-    "modernizr": "~2.6.2",
-    "jquery": "~1.10.2",
-    "mathjs": "~0.15.0",
+    "sass-bootstrap": "~3.0.2",
+    "modernizr": "~2.7.1",
+    "jquery": "~2.0.3",
+    "mathjs": "~0.17.1",
     "hammerjs": "~1.0.5"
   },
   "devDependencies": {}
