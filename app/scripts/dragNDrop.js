@@ -31,14 +31,12 @@
       }
       
       // widget cannot be moved outside of the container
-      if (newY > containerHeight) {
-        posY = containerHeight;
-      } else if (newY < 0) {
+      if (newY < 0) {
         posY = 0;
       } else {
         posY = newY;
       }
-      
+
       widget.css({
         left: posX + 'px',
         top: posY + 'px'
