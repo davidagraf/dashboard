@@ -4,7 +4,8 @@
 
 (function() {
   var widgetsHeights = [3,2,5,1,1,4,3,6,2,4,2,4,3,2,1,5,1,1,4,3,6,2,4],
-      widgetsWidths =  [1,1,2,1,1,1,1,2,1,1,1,1,3,1,1,1,1,2,1,1,1,1,1],
+//      widgetsWidths =  [1,1,2,1,1,1,1,2,1,1,1,1,3,1,1,1,1,2,1,1,1,1,1],
+      widgetsWidths =  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       COLUMN_WIDTH = 250,
       MARGIN = 15,
       ROW_HEIGHT = 50,
@@ -77,12 +78,12 @@
   createDragNDropHandler = function($widget) {
     var offset;
     return {
-      prepareForDrag: function(dragNDrop) {
+      prepareForDrag: function(/*dragNDrop*/) {
         offset = $widget.offset();
         $widget.addClass('dragging');
         $('body').addClass('noselect');
       },
-      prepareForDrop: function(dragNDrop) {
+      prepareForDrop: function(/*dragNDrop*/) {
         $widget.removeClass('dragging');
         $('body').removeClass('noselect');
         $widget.offset(offset);
