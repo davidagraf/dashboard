@@ -1,10 +1,12 @@
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var express = require('express');
-var path = require('path');
-var tinylr = require('tiny-lr');
-var sass = require('gulp-sass');
-var open = require('gulp-open');
+'use strict';
+
+var gulp = require('gulp'),
+    gutil = require('gulp-util'),
+    express = require('express'),
+    path = require('path'),
+    tinylr = require('tiny-lr'),
+    sass = require('gulp-sass'),
+    jshint = require('gulp-jshint');
 
 var createServers = function(port, lrport) {
   var lr = tinylr();
@@ -23,10 +25,10 @@ var createServers = function(port, lrport) {
       gutil.log('Listening on', port);
     });
 
- return {
-   lr: lr,
-   app: app
- };
+  return {
+    lr: lr,
+    app: app
+  };
 };
 
 gulp.task('sass', function () {
@@ -38,7 +40,7 @@ gulp.task('sass', function () {
 gulp.task('default', function(){
   var servers = createServers(8080, 35729);
 
-  gulp.watch(["app/**/*", ".tmp2/**/*", "!app/bower_components/**/*"], function(evt) {
+  gulp.watch(['app/**/*', '.tmp2/**/*', '!app/bower_components/**/*'], function(evt) {
     gutil.log(gutil.colors.cyan(evt.path), 'changed');
     servers.lr.changed({
       body: {
@@ -47,7 +49,13 @@ gulp.task('default', function(){
     });
   });
 
-  gulp.watch(["app/styles/**/*.scss"], function(evt) {
+  gulp.watch(['app/styles/**/*.scss'], function(/*evt*/) {
     gulp.run('sass');
   });
+});
+
+gulp.task('lint', function() {
+  gulp.src(['gulpfile.js', 'app/scripts/**/*.js'])
+    .pipe(jshint('.jshintrc'))
+    .pipe(jshint.reporter('jshint-stylish'));
 });

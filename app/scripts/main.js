@@ -77,12 +77,12 @@
   createDragNDropHandler = function($widget) {
     var offset;
     return {
-      prepareForDrag: function(dragNDrop) {
+      prepareForDrag: function(/*dragNDrop*/) {
         offset = $widget.offset();
         $widget.addClass('dragging');
         $('body').addClass('noselect');
       },
-      prepareForDrop: function(dragNDrop) {
+      prepareForDrop: function(/*dragNDrop*/) {
         $widget.removeClass('dragging');
         $('body').removeClass('noselect');
         $widget.offset(offset);
