@@ -3,7 +3,8 @@
 'use strict';
 
 (function() {
-  var widgetsHeights = [3, 2, 5, 1, 1, 4, 3, 6, 2, 4, 2, 4, 3, 2, 1, 5, 1, 1, 4, 3, 6, 2, 4],
+  var widgetsHeights = [3,2,5,1,1,4,3,6,2,4,2,4,3,2,1,5,1,1,4,3,6,2,4],
+      widgetsWidths =  [1,1,2,1,1,1,1,2,1,1,1,1,3,1,1,1,1,2,1,1,1,1,1],
       COLUMN_WIDTH = 250,
       MARGIN = 15,
       ROW_HEIGHT = 50,
@@ -58,7 +59,6 @@
       if (savePosition) {
         widget.top = free[minCol];
         widget.left = minCol;
-        widget.dom.attr('data-col', minCol);
       }
 
       free[minCol] += (MARGIN + widget.dom.height());
@@ -98,6 +98,7 @@
           );
 
       $widget.height(ROW_HEIGHT * v);
+      $widget.attr('data-width', widgetsWidths[i]);
       widgets[i] = {
         top: 0,
         left: -1,
