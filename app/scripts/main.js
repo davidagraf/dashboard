@@ -12,7 +12,6 @@
       $container = $('#container'),
       widgets = new Array(widgetsHeights.length),
       math = mathjs(),
-      sumWidgetHeights = 0,
  
   computeNrOfColumns = function() {
     var nr = Math.floor(($container.width() + MARGIN) / (COLUMN_WIDTH + MARGIN));
@@ -37,16 +36,9 @@
 
     $.each(widgets, function(i, widget) {
       var from, to, j, minCol;
-      if (widget.left < 0) {
-        from = 0;
-        to = nrOfColumns - 1;
-      } else {
-        from = math.floor(widget.left * nrOfColumns / originalNrOfColumns);
-        to = math.ceil((widget.left + 1) * nrOfColumns / originalNrOfColumns) - 1;
-      }
 
-      minCol = from;
-      for (j = from + 1; j <= to; ++j) {
+      minCol = 0;
+      for (j = 1; j < nrOfColumns; ++j) {
         if (free[j] < free[minCol]) {
           minCol = j;
         }
@@ -111,7 +103,6 @@
       dragNDrop.init();
 
       $container.append($widget);
-      sumWidgetHeights += ($widget.height() + MARGIN);
     });
     positionWidgets(true);
 
