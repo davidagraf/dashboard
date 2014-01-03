@@ -52,6 +52,7 @@ gulp.task('default', function(){
   gulp.watch(['app/styles/**/*.scss'], function(/*evt*/) {
     gulp.run('sass');
   });
+  gulp.run('sass');
 });
 
 gulp.task('lint', function() {
