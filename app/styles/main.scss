@@ -37,7 +37,7 @@ $icon-font-path: "/bower_components/sass-bootstrap/fonts/";
 
   $time-move: 0.8s;
   &:not(.dragging) {
-    -webkit-transition: top $time-move ease, left $time-move ease, opacity $time-move ease-out;
+    transition: top $time-move ease, left $time-move ease, opacity $time-move ease-out;
   }
   &.dragging {
     z-index: 100;

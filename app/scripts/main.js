@@ -20,15 +20,11 @@
     }
     return nr;
   },
-  originalNrOfColumns = computeNrOfColumns(),
-  nrOfColumns = originalNrOfColumns,
+  nrOfColumns = computeNrOfColumns(),
 
   positionWidgets = function(savePosition) {
     var free = new Array(nrOfColumns),
         max;
-
-    console.log('Repositioning with ' + nrOfColumns + ' columns.');
-    console.log('Original: ' + originalNrOfColumns);
 
     $.each(free, function(i) {
       free[i] = 0;
