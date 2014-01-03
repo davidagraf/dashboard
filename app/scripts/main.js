@@ -4,8 +4,8 @@
 
 (function() {
   var widgetsHeights = [3,2,5,1,1,4,3,6,2,4,2,4,3,2,1,5,1,1,4,3,6,2,4],
-//      widgetsWidths =  [1,1,2,1,1,1,1,2,1,1,1,1,3,1,1,1,1,2,1,1,1,1,1],
-      widgetsWidths =  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      widgetsWidths =  [1,1,2,1,1,1,1,2,1,1,1,1,3,1,1,1,1,2,1,1,1,1,1],
+      //widgetsWidths =  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       COLUMN_WIDTH = 250,
       MARGIN = 15,
       ROW_HEIGHT = 50,
@@ -22,7 +22,7 @@
   },
   nrOfColumns = computeNrOfColumns(),
 
-  positionWidgets = function(savePosition) {
+  positionWidgets = function() {
     var free = new Array(nrOfColumns),
         max;
 
@@ -31,27 +31,32 @@
     });
 
     $.each(widgets, function(i, widget) {
-      var from, to, j, minCol;
+      var j, k, minCol, minTop, top;
 
       if (!widget.dom.hasClass('dragging')) {
         minCol = 0;
-        for (j = 1; j < nrOfColumns; ++j) {
-          if (free[j] < free[minCol]) {
+        minTop = math.max(free.slice(minCol, minCol + widget.width));
+        for (j = 1; j < nrOfColumns - (widget.width - 1); ++j) {
+          top = math.max(free.slice(j, j + widget.width));
+          if (top < minTop) {
             minCol = j;
+            minTop = top;
           }
         }
 
         widget.dom.css({
-          top: free[minCol],
+          top: minTop,
           left: minCol * (COLUMN_WIDTH + MARGIN)
         });
 
-        widget.prio = free[minCol] + minCol;
-        widget.top = free[minCol];
+        widget.prio = minTop + minCol;
+        widget.top = minTop;
         widget.col = minCol;
         widget.index = i;
 
-        free[minCol] += (MARGIN + widget.dom.height());
+        for (k = 0; k < widget.width; ++k) {
+          free[minCol + k] = (MARGIN + minTop + widget.dom.height());
+        }
       }
     });
 
@@ -72,7 +77,7 @@
         offset = widget.dom.offset();
         widget.dom.addClass('dragging');
         $('body').addClass('noselect');
-        positionWidgets(false);
+        positionWidgets();
       },
       prepareForDrop: function(dragNDrop) {
         var x = dragNDrop.getWidgetX(),
@@ -103,7 +108,7 @@
 
           widgets.splice(newPos, 0, widget);
 
-          positionWidgets(true);
+          positionWidgets();
         }
       }
     };
@@ -120,7 +125,8 @@
       $widget.attr('data-width', widgetsWidths[i]);
       widgets[i] = {
         prio: -1,
-        dom: $widget
+        dom: $widget,
+        width: widgetsWidths[i]
       };
 
       dragNDrop = window.createDragNDrop($container, $widget, $('.dragarea', $widget));
