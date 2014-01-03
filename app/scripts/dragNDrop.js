@@ -173,7 +173,28 @@
        * Returns X-position of widget. Relative and inside the container. 
        */
       getWidgetX: function() {
-        return originX;
+        var pos = originX - (baseMouseX - mouseX);
+
+        if (pos < 0) {
+          pos = 0;
+        } else if (pos > containerWidth) {
+          pos = containerWidth;
+        }
+
+        return pos;
+      },
+
+      /**
+       * Returns Y-position of widget. Relative and inside the container. 
+       */
+      getWidgetY: function() {
+        var pos = originY - (baseMouseY - mouseY);
+
+        if (pos < 0) {
+          pos = 0;
+        }
+
+        return pos;
       },
       
       /**
