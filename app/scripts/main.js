@@ -96,7 +96,6 @@
             col, i;
         widget.dom.removeClass('dragging');
         $('body').removeClass('noselect');
-        widget.dom.offset(offset);
 
         if (widgets.length > 1) {
           col = math.floor( (x + COLUMN_WIDTH / 2) / (COLUMN_WIDTH + MARGIN));
@@ -105,16 +104,17 @@
           } else if (col > (nrOfColumns - widget.width)) {
             col = nrOfColumns - widget.width;
           }
-          widgets.splice(widget.index, 1); // remove widget from old position
           
           // search new position
           widget.col = col;
           widget.top = Infinity;
+          widget.index = -1;
           for (i = widgets.length - 1; i >= 0; --i) {
             if (
-                (col <= widgets[i].col && col + widget.width > widgets[i].col
-                 || widgets[i].col <= col && widgets[i].col + widgets[i].width > col)
-                && widgets[i].top <= y) {
+                widgets[i].index >= 0 &&
+                (col <= widgets[i].col && col + widget.width > widgets[i].col ||
+                  widgets[i].col <= col && widgets[i].col + widgets[i].width > col) &&
+                widgets[i].top <= y) {
               if ((widgets[i].top + widgets[i].dom.height()) >= y) {
                 widget.top = widgets[i].top;
               } else {
@@ -123,9 +123,6 @@
               break;
             }
           }
-
-          widget.index = -1;
-          widgets.push(widget);
 
           positionWidgets();
         }

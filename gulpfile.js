@@ -6,7 +6,8 @@ var gulp = require('gulp'),
     path = require('path'),
     tinylr = require('tiny-lr'),
     sass = require('gulp-sass'),
-    jshint = require('gulp-jshint');
+    jshint = require('gulp-jshint'),
+    jscs = require('gulp-jscs');
 
 var createServers = function(port, lrport) {
   var lr = tinylr();
@@ -59,4 +60,6 @@ gulp.task('lint', function() {
   gulp.src(['gulpfile.js', 'app/scripts/**/*.js'])
     .pipe(jshint('.jshintrc'))
     .pipe(jshint.reporter('jshint-stylish'));
+  gulp.src(['gulpfile.js', 'app/scripts/**/*.js'])
+    .pipe(jscs());
 });
