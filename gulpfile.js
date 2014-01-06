@@ -39,7 +39,7 @@ gulp.task('sass', function () {
 });
 
 gulp.task('default', function(){
-  var servers = createServers(8080, 35729);
+  var servers = createServers(8888, 35729);
 
   gulp.watch(['app/**/*', '.tmp2/**/*', '!app/bower_components/**/*'], function(evt) {
     gutil.log(gutil.colors.cyan(evt.path), 'changed');

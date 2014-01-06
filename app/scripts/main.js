@@ -25,8 +25,6 @@
   widgetsSorter = function(a, b) {
     if (a.top !== b.top) {
       return a.top - b.top;
-    } else if (a.col !== b.col) {
-      return a.col - b.col;
     } else {
       return a.index - b.index;
     }
@@ -46,13 +44,19 @@
       var j, k, minCol, minTop, top;
 
       if (!widget.dom.hasClass('dragging')) {
-        minCol = 0;
-        minTop = math.max(free.slice(minCol, minCol + widget.width));
-        for (j = 1; j < nrOfColumns - (widget.width - 1); ++j) {
-          top = math.max(free.slice(j, j + widget.width));
-          if (top < minTop) {
-            minCol = j;
-            minTop = top;
+
+        if (widget.index < 0) {
+          minCol = widget.col;
+          minTop = math.max(free.slice(minCol, minCol + widget.width));
+        } else {
+          minCol = 0;
+          minTop = math.max(free.slice(minCol, minCol + widget.width));
+          for (j = 1; j < nrOfColumns - (widget.width - 1); ++j) {
+            top = math.max(free.slice(j, j + widget.width));
+            if (top < minTop) {
+              minCol = j;
+              minTop = top;
+            }
           }
         }
 
@@ -93,7 +97,7 @@
       prepareForDrop: function(dragNDrop) {
         var x = dragNDrop.getWidgetX(),
             y = dragNDrop.getWidgetY(),
-            col, i;
+            col, i, tmp;
         widget.dom.removeClass('dragging');
         $('body').removeClass('noselect');
 
@@ -113,14 +117,11 @@
             if (
                 widgets[i].index >= 0 &&
                 (col <= widgets[i].col && col + widget.width > widgets[i].col ||
-                  widgets[i].col <= col && widgets[i].col + widgets[i].width > col) &&
-                widgets[i].top <= y) {
-              if ((widgets[i].top + widgets[i].dom.height()) >= y) {
+                  widgets[i].col <= col && widgets[i].col + widgets[i].width > col)) {
+              tmp = widgets[i].top + widgets[i].dom.height();
+              if (tmp > y && widgets[i].top < widget.top) {
                 widget.top = widgets[i].top;
-              } else {
-                widget.top = widgets[i].top + widgets[i].dom.height() + MARGIN;
               }
-              break;
             }
           }
 
@@ -140,6 +141,7 @@
       $widget.height(ROW_HEIGHT * v);
       $widget.attr('data-width', widgetsWidths[i]);
       widgets[i] = {
+        name: i,
         dom: $widget,
         width: widgetsWidths[i],
         top: 0,
