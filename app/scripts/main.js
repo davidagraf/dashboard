@@ -127,7 +127,7 @@
           widget.index = -1;
           widgets.push(widget);
 
-          ositionWidgets();
+          positionWidgets();
         }
       }
     };
