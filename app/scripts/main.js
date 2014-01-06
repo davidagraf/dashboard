@@ -22,9 +22,21 @@
   },
   nrOfColumns = computeNrOfColumns(),
 
+  widgetsSorter = function(a, b) {
+    if (a.top !== b.top) {
+      return a.top - b.top;
+    } else if (a.col !== b.col) {
+      return a.col - b.col;
+    } else {
+      return a.index - b.index;
+    }
+  },
+
   positionWidgets = function() {
     var free = new Array(nrOfColumns),
         max;
+
+    widgets.sort(widgetsSorter);
 
     $.each(free, function(i) {
       free[i] = 0;
@@ -49,7 +61,6 @@
           left: minCol * (COLUMN_WIDTH + MARGIN)
         });
 
-        widget.prio = minTop + minCol;
         widget.top = minTop;
         widget.col = minCol;
         widget.index = i;
@@ -82,7 +93,7 @@
       prepareForDrop: function(dragNDrop) {
         var x = dragNDrop.getWidgetX(),
             y = dragNDrop.getWidgetY(),
-            col, newPos, i;
+            col, i;
         widget.dom.removeClass('dragging');
         $('body').removeClass('noselect');
         widget.dom.offset(offset);
@@ -91,24 +102,32 @@
           col = math.floor( (x + COLUMN_WIDTH / 2) / (COLUMN_WIDTH + MARGIN));
           if (col < 0) {
             col = 0;
-          } else if (col >= nrOfColumns) {
-            col = nrOfColumns - 1;
+          } else if (col > (nrOfColumns - widget.width)) {
+            col = nrOfColumns - widget.width;
           }
           widgets.splice(widget.index, 1); // remove widget from old position
           
           // search new position
-          newPos = widgets.length;
+          widget.col = col;
+          widget.top = Infinity;
           for (i = widgets.length - 1; i >= 0; --i) {
-            if (widgets[i].col === col) {
+            if (
+                (col <= widgets[i].col && col + widget.width > widgets[i].col
+                 || widgets[i].col <= col && widgets[i].col + widgets[i].width > col)
+                && widgets[i].top <= y) {
               if ((widgets[i].top + widgets[i].dom.height()) >= y) {
-                newPos = i;
+                widget.top = widgets[i].top;
+              } else {
+                widget.top = widgets[i].top + widgets[i].dom.height() + MARGIN;
               }
+              break;
             }
           }
 
-          widgets.splice(newPos, 0, widget);
+          widget.index = -1;
+          widgets.push(widget);
 
-          positionWidgets();
+          ositionWidgets();
         }
       }
     };
@@ -124,9 +143,11 @@
       $widget.height(ROW_HEIGHT * v);
       $widget.attr('data-width', widgetsWidths[i]);
       widgets[i] = {
-        prio: -1,
         dom: $widget,
-        width: widgetsWidths[i]
+        width: widgetsWidths[i],
+        top: 0,
+        col: 0,
+        index: i
       };
 
       dragNDrop = window.createDragNDrop($container, $widget, $('.dragarea', $widget));
