@@ -45,7 +45,7 @@
 
       if (!widget.dom.hasClass('dragging')) {
 
-        if (widget.index < 0) {
+        if (widget.index < 0 && widget.top != Infinity) {
           minCol = widget.col;
           minTop = math.max(free.slice(minCol, minCol + widget.width));
         } else {
