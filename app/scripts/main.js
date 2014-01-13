@@ -3,12 +3,11 @@
 'use strict';
 
 (function() {
-  var widgetsHeights = [3,2,5,1,1,4,3,6,2,4,2,4,3,2,1,5,1,1,4,3,6,2,4],
+  var widgetsHeights = [3,2,2,1,1,2,3,1,2,4,2,4,3,2,1,2,1,1,3,3,1,2,3],
       widgetsWidths =  [1,1,2,1,1,1,1,2,1,1,1,1,3,1,1,1,1,2,1,1,1,1,1],
-      //widgetsWidths =  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-      COLUMN_WIDTH = 250,
+      COLUMN_WIDTH = 320,
       MARGIN = 15,
-      ROW_HEIGHT = 50,
+      ROW_HEIGHT = 200,
       $container = $('#container'),
       widgets = new Array(widgetsHeights.length),
       math = mathjs(),

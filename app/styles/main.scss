@@ -1,6 +1,12 @@
 $icon-font-path: "/bower_components/sass-bootstrap/fonts/";
+$widget-width: 320;
+$margin: 15;
 
 @import 'app/bower_components/sass-bootstrap/lib/bootstrap';
+
+@function width($count) {
+  @return unquote(($count * $widget-width + ($count - 1) * $margin) + 'px');
+}
 
 .browsehappy {
     margin: 0.2em 0;
@@ -15,20 +21,28 @@ $icon-font-path: "/bower_components/sass-bootstrap/fonts/";
 }
 
 #container {
-  width: 100%;
+  width: width(5);
   position: relative;
 }
 
+body {
+  padding: unquote($margin + 'px');
+}
+
+#head {
+  with: 100%;
+  background-color: #B80000;
+  height: 50px;
+  margin-bottom: 15px;
+}
+
 .widget {
-  width: 250px;
-  &[data-width="1"] {
-    width: 250px;
-  }
+  width: width(1);
   &[data-width="2"] {
-    width: 515px;
+    width: width(2);
   }
   &[data-width="3"] {
-    width: 780px;
+    width: width(3);
   }
   text-align: center;
   position: absolute;
