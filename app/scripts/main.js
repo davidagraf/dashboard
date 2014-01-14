@@ -7,7 +7,7 @@
       widgetsWidths =  [1,1,2,1,1,1,1,2,1,1,1,1,3,1,1,1,1,2,1,1,1,1,1],
       COLUMN_WIDTH = 320,
       MARGIN = 15,
-      ROW_HEIGHT = 200,
+      ROW_HEIGHT = 100,
       $container = $('#container'),
       widgets = new Array(widgetsHeights.length),
       math = mathjs(),
@@ -21,9 +21,16 @@
   },
   nrOfColumns = computeNrOfColumns(),
 
+  overlappingCols = function(widget1, widget2) {
+    return (widget1.col <= widget2.col && widget1.col + widget1.width > widget2.col) ||
+           (widget2.col <= widget1.col && widget2.col + widget2.width > widget1.col);
+  },
+
   widgetsSorter = function(a, b) {
     if (a.top !== b.top) {
       return a.top - b.top;
+    } else if (!overlappingCols(a,b)) {
+      return a.col - b.col;
     } else {
       return a.index - b.index;
     }
@@ -44,7 +51,7 @@
 
       if (!widget.dom.hasClass('dragging')) {
 
-        if (widget.index < 0 && widget.top != Infinity) {
+        if (widget.col >= 0) {
           minCol = widget.col;
           minTop = math.max(free.slice(minCol, minCol + widget.width));
         } else {
@@ -157,8 +164,8 @@
         name: i,
         dom: $widget,
         width: widgetsWidths[i],
-        top: 0,
-        col: 0,
+        top: Infinity,
+        col: -1,
         index: i
       };
 
