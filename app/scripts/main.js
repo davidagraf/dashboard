@@ -79,14 +79,10 @@
           free[minCol + k] = (MARGIN + minTop + widget.dom.height());
         }
       }
+
     });
 
-    max = -1;
-    $.each(free, function(i, v) {
-      if (max < v.top) {
-        max = v.top;
-      }
-    });
+    max = math.max(free);
     $container.height(max);
 
   },
@@ -183,6 +179,24 @@
         nrOfColumns = curColumns;
         positionWidgets();
       }
+    });
+
+    //zoom
+    if(!Hammer.HAS_TOUCHEVENTS && !Hammer.HAS_POINTEREVENTS) {
+      Hammer.plugins.showTouches();
+      Hammer.plugins.fakeMultitouch();
+    }
+
+    var hammertime = Hammer(document.getElementById('container'), {
+      transform_always_block: true,
+      transform_min_scale: 1,
+      drag_block_horizontal: true,
+      drag_block_vertical: true,
+      drag_min_distance: 0
+    });
+
+    hammertime.on('transform', function(ev) {
+      console.log(ev);
     });
   });
 

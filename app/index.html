@@ -19,8 +19,11 @@
   </head>
   <body>
     <div id="head">
+      THIS IS A HEADER
     </div>
-    <div id="container">
+    <div id="wrapper">
+      <div id="container">
+      </div>
     </div>
 
     <!-- build:js scripts/vendor.js -->
@@ -32,6 +35,8 @@
     <!-- build:js scripts/main.js -->
     <script src="bower_components/mathjs/dist/math.js"></script>
     <script src="bower_components/hammerjs/dist/hammer.js"></script>
+    <script src="bower_components/hammerjs/plugins/hammer.fakemultitouch.js"></script>
+    <script src="bower_components/hammerjs/plugins/hammer.showtouches.js"></script>
     <script src="scripts/dragNDrop.js"></script>
     <script src="scripts/main.js"></script>
     <!-- endbuild -->

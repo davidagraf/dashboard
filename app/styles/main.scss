@@ -20,6 +20,11 @@ $margin: 15;
   -webkit-user-select: none;
 }
 
+#wrapper {
+  width: 100%;
+  overflow-y: scroll;
+}
+
 #container {
   width: width(5);
   position: relative;
