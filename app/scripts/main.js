@@ -212,7 +212,7 @@
             tmp = min;
           }
           $container.css(
-            '-webkit-transform', 
+            '-webkit-transform',
             'scale('+ containerNextScale + ', ' + tmp + ')');
           containerNextScale = tmp;
           break;
