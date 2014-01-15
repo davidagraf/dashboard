@@ -169,7 +169,7 @@
         index: i
       };
 
-      dragNDrop = window.createDragNDrop($container, $widget, $('.dragarea', $widget));
+      dragNDrop = window.createDragNDrop($container, $widget, $('.dragarea', $widget, $wrapper));
       dragNDrop.setHandler(createDragNDropHandler(widgets[i]));
       dragNDrop.init();
 
@@ -183,6 +183,10 @@
         nrOfColumns = curColumns;
         positionWidgets();
       }
+    });
+
+    $wrapper.on('scroll', function(ev) {
+      console.log($wrapper.scrollLeft());
     });
 
     //zoom

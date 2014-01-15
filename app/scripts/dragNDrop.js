@@ -2,11 +2,12 @@
 
 (function() {
 
-  window.createDragNDrop = function(container, widget, dragArea) {
+  window.createDragNDrop = function(container, widget, dragArea, scrollArea) {
     var
     that, // instance created by this factory
     DOCUMENT = jQuery(document), // jQuery Document object
     originX, originY, // position of widget before dragging
+    lastScroll,
     baseMouseX, baseMouseY, // position of mouse/touch before dragging
     mouseX, mouseY, // current position of mouse/touch
     containerX, containerY, containerWidth, containerHeight, // properties of container
@@ -41,6 +42,10 @@
         top: posY + 'px'
       });
     },
+
+    scrollHandler = function(ev) {
+      lastScroll = ev.scrollLeft();
+    },
     
     /**
      * Touch move callback
@@ -74,6 +79,9 @@
      * Common drop code
      */
     drop = function() {
+      if (scrollArea) {
+        scrollArea.unbind('scroll', scrollHandler);
+      }
       if (handler.prepareForDrop) {
         handler.prepareForDrop(that);
       }
@@ -101,6 +109,10 @@
      * Stores properties of container and widget before dragging.
      */
     prepareForDrag = function() {
+      if (scrollArea) {
+        lastScroll = scrollArea.scrollLeft();
+        scrollArea.on('scroll', scrollHandler);
+      }
       containerX = container.offset().left;
       containerY = container.offset().top;
       containerWidth = container.width();
