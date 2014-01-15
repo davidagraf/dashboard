@@ -1,5 +1,3 @@
-/* global hammertime:true */
-
 'use strict';
 
 (function() {
@@ -14,6 +12,7 @@
     containerX, containerY, containerWidth, containerHeight, // properties of container
     widgetWidth, // width of widget
     handler = {}, // callbacks from outside
+    hammertime,
     
     /**
      * Moves the widget.

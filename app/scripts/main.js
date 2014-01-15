@@ -1,4 +1,5 @@
 /* global mathjs:true */
+/* global Hammer:true */
 
 'use strict';
 
@@ -9,6 +10,7 @@
       MARGIN = 15,
       ROW_HEIGHT = 100,
       $container = $('#container'),
+      $wrapper = $('#wrapper'),
       widgets = new Array(widgetsHeights.length),
       math = mathjs(),
  
@@ -148,6 +150,8 @@
   };
 
   $(function() {
+    var containerScale = 1, containerNextScale = 1;
+
     $.each(widgetsHeights, function(i, v) {
       var dragNDrop,
           $widget = $(
@@ -183,21 +187,42 @@
 
     //zoom
     if(!Hammer.HAS_TOUCHEVENTS && !Hammer.HAS_POINTEREVENTS) {
-      Hammer.plugins.showTouches();
       Hammer.plugins.fakeMultitouch();
     }
 
-    var hammertime = Hammer(document.getElementById('container'), {
-      transform_always_block: true,
-      transform_min_scale: 1,
-      drag_block_horizontal: true,
-      drag_block_vertical: true,
-      drag_min_distance: 0
+    var hammertime = $container.hammer({
+      'transform_always_block': true,
+      'transform_min_scale': 1,
+      'drag_block_horizontal': false,
+      'drag_block_vertical': false,
+      'drag_min_distance': 0
     });
 
-    hammertime.on('transform', function(ev) {
-      console.log(ev);
+    hammertime.on('transform touch release', function(ev) {
+      var tmp, min;
+      switch(ev.type) {
+        case 'touch':
+          break;
+        case 'transform':
+          tmp = ev.gesture.scale * containerScale;
+          min = $wrapper.width() / $container.width();
+          if (tmp > 1) {
+            tmp = 1;
+          } else if (tmp < min) {
+            tmp = min;
+          }
+          $container.css(
+            '-webkit-transform', 
+            'scale('+ containerNextScale + ', ' + tmp + ')');
+          console.log(ev.gesture.scale + ' * ' + tmp);
+          containerNextScale = tmp;
+          break;
+        case 'release':
+          containerScale = containerNextScale;
+          break;
+      }
     });
+
   });
 
 })();
