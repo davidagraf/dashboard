@@ -185,10 +185,6 @@
       }
     });
 
-    $wrapper.on('scroll', function(ev) {
-      console.log($wrapper.scrollLeft());
-    });
-
     //zoom
     if(!Hammer.HAS_TOUCHEVENTS && !Hammer.HAS_POINTEREVENTS) {
       Hammer.plugins.fakeMultitouch();
@@ -218,7 +214,6 @@
           $container.css(
             '-webkit-transform', 
             'scale('+ containerNextScale + ', ' + tmp + ')');
-          console.log(ev.gesture.scale + ' * ' + tmp);
           containerNextScale = tmp;
           break;
         case 'release':
