@@ -7,7 +7,9 @@ var gulp = require('gulp'),
     tinylr = require('tiny-lr'),
     sass = require('gulp-sass'),
     jshint = require('gulp-jshint'),
-    jscs = require('gulp-jscs');
+    jscs = require('gulp-jscs'),
+    ignore = require('gulp-ignore'),
+    rimraf = require('gulp-rimraf');
 
 var createServers = function(port, lrport) {
   var lr = tinylr();
@@ -32,10 +34,37 @@ var createServers = function(port, lrport) {
   };
 };
 
-gulp.task('sass', function () {
+gulp.task('sass', function() {
   gulp.src('app/styles/**/*.scss')
     .pipe(sass())
     .pipe(gulp.dest('.tmp2/styles'));
+});
+
+gulp.task('deploy', function() {
+  gulp.src('dist/*', { read: false })
+    .pipe(ignore('.git'))
+    .pipe(rimraf());
+  gulp.src('app/styles/**/*.scss')
+    .pipe(sass())
+    .pipe(gulp.dest('dist/styles'));
+  gulp.src('app/bower_components/modernizr/**/*')
+    .pipe(gulp.dest('dist/bower_components/modernizr'));
+  gulp.src('app/bower_components/jquery/**/*')
+    .pipe(gulp.dest('dist/bower_components/jquery'));
+  gulp.src('app/bower_components/mathjs/dist/**/*')
+    .pipe(gulp.dest('dist/bower_components/mathjs/dist'));
+  gulp.src('app/bower_components/hammerjs/**/*')
+    .pipe(gulp.dest('dist/bower_components/hammerjs'));
+  gulp.src('app/scripts/**/*')
+    .pipe(gulp.dest('dist/scripts'));
+  gulp.src([
+      'app/.htaccess',
+      'app/404.html',
+      'app/favicon.ico',
+      'app/index.html',
+      'app/robots.txt'
+  ])
+    .pipe(gulp.dest('dist'));
 });
 
 gulp.task('default', function(){
