@@ -7,7 +7,7 @@
     that, // instance created by this factory
     DOCUMENT = jQuery(document), // jQuery Document object
     originX, originY, // position of widget before dragging
-    lastScroll,
+    initScroll, lastScroll,
     baseMouseX, baseMouseY, // position of mouse/touch before dragging
     mouseX, mouseY, // current position of mouse/touch
     containerX, containerY, containerWidth, containerHeight, // properties of container
@@ -44,7 +44,13 @@
     },
 
     scrollHandler = function(ev) {
-      lastScroll = ev.scrollLeft();
+      var newX, newY;
+      lastScroll = scrollArea.scrollLeft();
+
+      newX = originX + (lastScroll - initScroll) + (mouseX - baseMouseX);
+      newY = originY + (mouseY - baseMouseY);
+
+      drag(ev, newX, newY);
     },
     
     /**
@@ -52,7 +58,7 @@
      */
     touchDrag = function(ev) {
       var
-        newX = originX + ev.gesture.deltaX,
+        newX = originX + (lastScroll - initScroll) + ev.gesture.deltaX,
         newY = originY + ev.gesture.deltaY;
    
       mouseX = baseMouseX + ev.gesture.deltaX;
@@ -66,7 +72,7 @@
      */
     mouseDrag = function(ev) {
       var
-        newX = originX + (ev.pageX - baseMouseX),
+        newX = originX + (lastScroll - initScroll) + (ev.pageX - baseMouseX),
         newY = originY + (ev.pageY - baseMouseY);
       
       mouseX = ev.pageX;
@@ -110,7 +116,7 @@
      */
     prepareForDrag = function() {
       if (scrollArea) {
-        lastScroll = scrollArea.scrollLeft();
+        initScroll = lastScroll = scrollArea.scrollLeft();
         scrollArea.on('scroll', scrollHandler);
       }
       containerX = container.offset().left;
@@ -229,7 +235,7 @@
       init: function() {
         widgetWidth = widget.width(); // .front select will disappear after widget redesign
         
-        if (window.ontouchstart !== undefined) {
+        if (Hammer.HAS_TOUCHEVENTS) {
           // for touch
           hammertime = dragArea.hammer({
             'transform_always_block': true,

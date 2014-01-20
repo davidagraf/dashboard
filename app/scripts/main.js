@@ -169,7 +169,7 @@
         index: i
       };
 
-      dragNDrop = window.createDragNDrop($container, $widget, $('.dragarea', $widget, $wrapper));
+      dragNDrop = window.createDragNDrop($container, $widget, $('.dragarea', $widget), $wrapper);
       dragNDrop.setHandler(createDragNDropHandler(widgets[i]));
       dragNDrop.init();
 
