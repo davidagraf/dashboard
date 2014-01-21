@@ -17,31 +17,35 @@
     handler = {}, // callbacks from outside
     hammertime,
 
+    getWidgetXInt = function() {
+      var pos = originX + (lastScroll - initScroll) + (mouseX - baseMouseX);
+
+      if (pos < 0) {
+        pos = 0;
+      } else if (pos + widgetWidth > containerWidth) {
+        pos = containerWidth-widgetWidth;
+      }
+
+      return pos/scale.scale;
+    },
+
+    getWidgetYInt = function() {
+      var pos = originY + (mouseY - baseMouseY);
+
+      if (pos < 0) {
+        pos = 0;
+      }
+
+      return pos/scale.scale;
+    },
+
     /**
      * Moves the widget.
      */
     drag = function(/*ev*/) {
-      var newX = originX + (lastScroll - initScroll) + (mouseX - baseMouseX),
-          newY = originY + (mouseY - baseMouseY);
-
-      newX = newX / scale.scale;
-      newY = newY / scale.scale;
-      
-      // widget cannot be moved outside of the container
-      if (newX + widgetWidth > containerWidth) {
-        newX = containerWidth - widgetWidth;
-      } else if (newX < 0) {
-        newX = 0;
-      }
-      
-      // widget cannot be moved outside of the container
-      if (newY < 0) {
-        newY = 0;
-      }
-
       widget.css({
-        left: newX + 'px',
-        top: newY + 'px'
+        left: getWidgetXInt() + 'px',
+        top: getWidgetYInt() + 'px'
       });
     },
 
@@ -164,28 +168,14 @@
        * Returns X-position of widget. Relative and inside the container. 
        */
       getWidgetX: function() {
-        var pos = originX - (baseMouseX - mouseX);
-
-        if (pos < 0) {
-          pos = 0;
-        } else if (pos > containerWidth) {
-          pos = containerWidth;
-        }
-
-        return pos/scale.scale;
+        return getWidgetXInt();
       },
 
       /**
        * Returns Y-position of widget. Relative and inside the container. 
        */
       getWidgetY: function() {
-        var pos = originY - (baseMouseY - mouseY);
-
-        if (pos < 0) {
-          pos = 0;
-        }
-
-        return pos/scale.scale;
+        return getWidgetYInt();
       },
       
       /**
