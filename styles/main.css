@@ -4382,10 +4382,10 @@ th.hidden-lg, td.hidden-lg {
 
 #wrapper {
   width: 100%;
-  overflow-y: scroll; }
+  overflow-y: hidden; }
 
 #container {
-  width: 1660px;
+  width: 1690px;
   position: relative;
   -webkit-transform-origin: 0px 0px; }
 
@@ -4393,7 +4393,7 @@ body {
   padding: 15px; }
 
 #head {
-  with: 100%;
+  width: 100%;
   background-color: #b80000;
   height: 50px;
   margin-bottom: 15px; }
@@ -4408,6 +4408,8 @@ body {
     width: 655px; }
   .widget[data-width="3"] {
     width: 990px; }
+  .widget.dragging {
+    background-color: #b80000; }
   .widget:not(.dragging) {
     transition: top 0.8s ease, left 0.8s ease, opacity 0.8s ease-out; }
   .widget.dragging {

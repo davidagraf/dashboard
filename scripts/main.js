@@ -1,5 +1,4 @@
 /* global mathjs:true */
-/* global Hammer:true */
 
 'use strict';
 
@@ -11,8 +10,11 @@
       ROW_HEIGHT = 100,
       $container = $('#container'),
       $wrapper = $('#wrapper'),
+      headHeight = $('#head').height(),
       widgets = new Array(widgetsHeights.length),
       math = mathjs(),
+      scale = {scale: 1},
+      verticalWidgetSpace = 0,
  
   computeNrOfColumns = function() {
     var nr = Math.floor(($container.width() + MARGIN) / (COLUMN_WIDTH + MARGIN));
@@ -39,8 +41,7 @@
   },
 
   positionWidgets = function() {
-    var free = new Array(nrOfColumns),
-        max;
+    var free = new Array(nrOfColumns);
 
     widgets.sort(widgetsSorter);
 
@@ -84,8 +85,8 @@
 
     });
 
-    max = math.max(free);
-    $container.height(max);
+    verticalWidgetSpace = math.max(free);
+    $container.height(verticalWidgetSpace*scale.scale);
 
   },
   
@@ -150,7 +151,7 @@
   };
 
   $(function() {
-    var containerScale = 1, containerNextScale = 1;
+    var containerNextScale = scale.scale, initScrollLeft, initScrollTop, touchX, touchY;
 
     $.each(widgetsHeights, function(i, v) {
       var dragNDrop,
@@ -169,11 +170,12 @@
         index: i
       };
 
-      dragNDrop = window.createDragNDrop($container, $widget, $('.dragarea', $widget, $wrapper));
+      $container.append($widget);
+
+      dragNDrop = window.createDragNDrop($container, $widget, $('.dragarea', $widget), $wrapper, scale);
       dragNDrop.setHandler(createDragNDropHandler(widgets[i]));
       dragNDrop.init();
 
-      $container.append($widget);
     });
     positionWidgets();
 
@@ -186,10 +188,6 @@
     });
 
     //zoom
-    if(!Hammer.HAS_TOUCHEVENTS && !Hammer.HAS_POINTEREVENTS) {
-      Hammer.plugins.fakeMultitouch();
-    }
-
     var hammertime = $container.hammer({
       'transform_always_block': true,
       'transform_min_scale': 1,
@@ -202,9 +200,13 @@
       var tmp, min;
       switch(ev.type) {
         case 'touch':
+          initScrollLeft = $wrapper.scrollLeft();
+          initScrollTop = $(document).scrollTop();
+          touchX = ev.gesture.center.pageX;
+          touchY = ev.gesture.center.pageY - headHeight;
           break;
         case 'transform':
-          tmp = ev.gesture.scale * containerScale;
+          tmp = ev.gesture.scale * scale.scale;
           min = $wrapper.width() / $container.width();
           if (tmp > 1) {
             tmp = 1;
@@ -215,9 +217,18 @@
             '-webkit-transform',
             'scale('+ containerNextScale + ', ' + tmp + ')');
           containerNextScale = tmp;
+
+          $container.height(verticalWidgetSpace*containerNextScale);
+
+          tmp = touchX * containerNextScale / scale.scale - touchX + initScrollLeft;
+          $wrapper.scrollLeft(tmp);
+
+          tmp = touchY * containerNextScale / scale.scale - touchY + initScrollTop;
+          $(document).scrollTop(tmp);
+
           break;
         case 'release':
-          containerScale = containerNextScale;
+          scale.scale = containerNextScale;
           break;
       }
     });

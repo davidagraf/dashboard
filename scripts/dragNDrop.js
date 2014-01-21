@@ -1,78 +1,78 @@
+/* global Hammer:true */
+
 'use strict';
 
 (function() {
 
-  window.createDragNDrop = function(container, widget, dragArea, scrollArea) {
+  window.createDragNDrop = function(container, widget, dragArea, scrollArea, scale) {
     var
     that, // instance created by this factory
     DOCUMENT = jQuery(document), // jQuery Document object
     originX, originY, // position of widget before dragging
-    lastScroll,
+    initScroll, lastScroll,
     baseMouseX, baseMouseY, // position of mouse/touch before dragging
     mouseX, mouseY, // current position of mouse/touch
     containerX, containerY, containerWidth, containerHeight, // properties of container
     widgetWidth, // width of widget
     handler = {}, // callbacks from outside
     hammertime,
-    
+
+    getWidgetXInt = function() {
+      var pos = originX + (lastScroll - initScroll) + (mouseX - baseMouseX);
+
+      if (pos < 0) {
+        pos = 0;
+      } else if (pos + widgetWidth > containerWidth) {
+        pos = containerWidth-widgetWidth;
+      }
+
+      return pos/scale.scale;
+    },
+
+    getWidgetYInt = function() {
+      var pos = originY + (mouseY - baseMouseY);
+
+      if (pos < 0) {
+        pos = 0;
+      }
+
+      return pos/scale.scale;
+    },
+
     /**
      * Moves the widget.
      */
-    drag = function(ev, newX, newY) {
-      var posX, posY;
-      
-      // widget cannot be moved outside of the container
-      if (newX + widgetWidth > containerWidth) {
-        posX = containerWidth - widgetWidth;
-      } else if (newX < 0) {
-        posX = 0;
-      } else {
-        posX = newX;
-      }
-      
-      // widget cannot be moved outside of the container
-      if (newY < 0) {
-        posY = 0;
-      } else {
-        posY = newY;
-      }
-
+    drag = function(/*ev*/) {
       widget.css({
-        left: posX + 'px',
-        top: posY + 'px'
+        left: getWidgetXInt() + 'px',
+        top: getWidgetYInt() + 'px'
       });
     },
 
     scrollHandler = function(ev) {
-      lastScroll = ev.scrollLeft();
+      lastScroll = scrollArea.scrollLeft();
+
+      drag(ev);
     },
     
     /**
      * Touch move callback
      */
     touchDrag = function(ev) {
-      var
-        newX = originX + ev.gesture.deltaX,
-        newY = originY + ev.gesture.deltaY;
-   
       mouseX = baseMouseX + ev.gesture.deltaX;
       mouseY = baseMouseY + ev.gesture.deltaY;
       
-      drag(ev, newX, newY);
+      drag(ev);
     },
     
     /**
      * Mouse move callback
      */
     mouseDrag = function(ev) {
-      var
-        newX = originX + (ev.pageX - baseMouseX),
-        newY = originY + (ev.pageY - baseMouseY);
-      
       mouseX = ev.pageX;
       mouseY = ev.pageY;
       
-      drag(ev, newX, newY);
+      drag(ev);
     },
     
     /**
@@ -110,7 +110,7 @@
      */
     prepareForDrag = function() {
       if (scrollArea) {
-        lastScroll = scrollArea.scrollLeft();
+        initScroll = lastScroll = scrollArea.scrollLeft();
         scrollArea.on('scroll', scrollHandler);
       }
       containerX = container.offset().left;
@@ -153,7 +153,6 @@
     };
     
     that = {
-        
       /**
        * Sets the handler to receive callbacks.
        * The following methods are called, if they exist:
@@ -166,70 +165,26 @@
       },
       
       /**
-       * Returns X-position of mouse. Relative and inside the container. 
-       */
-      getMouseX: function() {
-        var pos = mouseX - containerX;
-        
-        if (pos < 0) {
-          pos = 0;
-        } else if (pos > containerWidth) {
-          pos = containerWidth;
-        }
-
-        return pos;
-      },
-      
-      /**
        * Returns X-position of widget. Relative and inside the container. 
        */
       getWidgetX: function() {
-        var pos = originX - (baseMouseX - mouseX);
-
-        if (pos < 0) {
-          pos = 0;
-        } else if (pos > containerWidth) {
-          pos = containerWidth;
-        }
-
-        return pos;
+        return getWidgetXInt();
       },
 
       /**
        * Returns Y-position of widget. Relative and inside the container. 
        */
       getWidgetY: function() {
-        var pos = originY - (baseMouseY - mouseY);
-
-        if (pos < 0) {
-          pos = 0;
-        }
-
-        return pos;
-      },
-      
-      /**
-       * Returns Y-position of mouse. Relative and inside the container. 
-       */
-      getMouseY: function() {
-        var pos = mouseY - containerY;
-        
-        if (pos < 0) {
-          pos = 0;
-        } else if (pos >= containerHeight) {
-          pos = containerHeight;
-        }
-
-        return pos;
+        return getWidgetYInt();
       },
       
       /**
        * Initializes dragging.
        */
       init: function() {
-        widgetWidth = widget.width(); // .front select will disappear after widget redesign
+        widgetWidth = widget.width();
         
-        if (window.ontouchstart !== undefined) {
+        if (Hammer.HAS_TOUCHEVENTS) {
           // for touch
           hammertime = dragArea.hammer({
             'transform_always_block': true,
