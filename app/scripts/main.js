@@ -11,6 +11,7 @@
       ROW_HEIGHT = 100,
       $container = $('#container'),
       $wrapper = $('#wrapper'),
+      headHeight = $('#head').height(),
       widgets = new Array(widgetsHeights.length),
       math = mathjs(),
       scale = {scale: 1},
@@ -151,7 +152,7 @@
   };
 
   $(function() {
-    var containerNextScale = scale.scale, initScrollLeft, scrollTopRatio;
+    var containerNextScale = scale.scale, initScrollLeft, initScrollTop, touchX, touchY;
 
     $.each(widgetsHeights, function(i, v) {
       var dragNDrop,
@@ -205,7 +206,10 @@
       switch(ev.type) {
         case 'touch':
           initScrollLeft = $wrapper.scrollLeft();
-          scrollTopRatio = $(document).scrollTop()/($(document).height() - $(window).height());
+          initScrollTop = $(document).scrollTop();
+          touchX = ev.gesture.center.pageX;
+          touchY = ev.gesture.center.pageY - headHeight;
+          console.log(touchY);
           break;
         case 'transform':
           tmp = ev.gesture.scale * scale.scale;
@@ -222,10 +226,11 @@
 
           $container.height(verticalWidgetSpace*containerNextScale);
 
-          tmp = (ev.gesture.center.pageX / scale.scale - ev.gesture.center.pageX / containerNextScale)*containerNextScale;
-          $wrapper.scrollLeft(initScrollLeft + tmp);
+          tmp = touchX * containerNextScale / scale.scale - touchX + initScrollLeft;
+          $wrapper.scrollLeft(tmp);
 
-          $(document).scrollTop(scrollTopRatio * ($(document).height() - $(window).height()));
+          tmp = touchY * containerNextScale / scale.scale - touchY + initScrollTop;
+          $(document).scrollTop(tmp);
 
           break;
         case 'release':

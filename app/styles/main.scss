@@ -55,6 +55,10 @@ body {
   font-size: 15px;
   background-color: #669933;
 
+  &.dragging {
+    background-color: #B80000;
+  }
+
   $time-move: 0.8s;
   &:not(.dragging) {
     transition: top $time-move ease, left $time-move ease, opacity $time-move ease-out;
