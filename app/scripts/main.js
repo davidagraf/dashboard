@@ -189,10 +189,6 @@
     });
 
     //zoom
-    if(!Hammer.HAS_TOUCHEVENTS && !Hammer.HAS_POINTEREVENTS) {
-      Hammer.plugins.fakeMultitouch();
-    }
-
     var hammertime = $container.hammer({
       'transform_always_block': true,
       'transform_min_scale': 1,
