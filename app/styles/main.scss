@@ -22,24 +22,24 @@ $margin: 15;
 
 #wrapper {
   width: 100%;
-  overflow-y: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 #container {
-  width: width(5);
+  width: unquote(5 * ($widget-width + $margin) + $margin + 'px');
   position: relative;
   -webkit-transform-origin: 0px 0px;
 }
 
 body {
-  padding: unquote($margin + 'px');
+  padding: 0px;
 }
 
 #head {
   with: 100%;
   background-color: #B80000;
   height: 50px;
-  margin-bottom: 15px;
 }
 
 .widget {

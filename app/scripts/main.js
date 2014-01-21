@@ -1,5 +1,4 @@
 /* global mathjs:true */
-/* global Hammer:true */
 
 'use strict';
 
@@ -47,7 +46,7 @@
     widgets.sort(widgetsSorter);
 
     $.each(free, function(i) {
-      free[i] = 0;
+      free[i] = MARGIN;
     });
 
     $.each(widgets, function(i, widget) {
@@ -72,7 +71,7 @@
 
         widget.dom.css({
           top: minTop,
-          left: minCol * (COLUMN_WIDTH + MARGIN)
+          left: MARGIN + minCol * (COLUMN_WIDTH + MARGIN)
         });
 
         widget.top = minTop;
@@ -205,7 +204,6 @@
           initScrollTop = $(document).scrollTop();
           touchX = ev.gesture.center.pageX;
           touchY = ev.gesture.center.pageY - headHeight;
-          console.log(touchY);
           break;
         case 'transform':
           tmp = ev.gesture.scale * scale.scale;
