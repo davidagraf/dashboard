@@ -13,6 +13,8 @@
       $wrapper = $('#wrapper'),
       widgets = new Array(widgetsHeights.length),
       math = mathjs(),
+      scale = {scale: 1},
+      verticalWidgetSpace = 0,
  
   computeNrOfColumns = function() {
     var nr = Math.floor(($container.width() + MARGIN) / (COLUMN_WIDTH + MARGIN));
@@ -39,8 +41,7 @@
   },
 
   positionWidgets = function() {
-    var free = new Array(nrOfColumns),
-        max;
+    var free = new Array(nrOfColumns);
 
     widgets.sort(widgetsSorter);
 
@@ -84,8 +85,8 @@
 
     });
 
-    max = math.max(free);
-    $container.height(max);
+    verticalWidgetSpace = math.max(free);
+    $container.height(verticalWidgetSpace*scale.scale);
 
   },
   
@@ -150,7 +151,7 @@
   };
 
   $(function() {
-    var scale = {scale: 1}, containerNextScale = 1;
+    var containerNextScale = scale.scale, initScrollLeft, scrollTopRatio;
 
     $.each(widgetsHeights, function(i, v) {
       var dragNDrop,
@@ -203,9 +204,10 @@
       var tmp, min;
       switch(ev.type) {
         case 'touch':
+          initScrollLeft = $wrapper.scrollLeft();
+          scrollTopRatio = $(document).scrollTop()/($(document).height() - $(window).height());
           break;
         case 'transform':
-          console.log(tmp);
           tmp = ev.gesture.scale * scale.scale;
           min = $wrapper.width() / $container.width();
           if (tmp > 1) {
@@ -217,6 +219,14 @@
             '-webkit-transform',
             'scale('+ containerNextScale + ', ' + tmp + ')');
           containerNextScale = tmp;
+
+          $container.height(verticalWidgetSpace*containerNextScale);
+
+          tmp = (ev.gesture.center.pageX / scale.scale - ev.gesture.center.pageX / containerNextScale)*containerNextScale;
+          $wrapper.scrollLeft(initScrollLeft + tmp);
+
+          $(document).scrollTop(scrollTopRatio * ($(document).height() - $(window).height()));
+
           break;
         case 'release':
           scale.scale = containerNextScale;
