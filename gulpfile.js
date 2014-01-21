@@ -63,7 +63,8 @@ gulp.task('deploy', function() {
       'app/favicon.ico',
       'app/index.html',
       'app/robots.txt'
-  ])
+    ]
+  )
     .pipe(gulp.dest('dist'));
 });
 

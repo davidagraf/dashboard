@@ -150,7 +150,7 @@
   };
 
   $(function() {
-    var containerScale = 1, containerNextScale = 1;
+    var scale = {scale: 1}, containerNextScale = 1;
 
     $.each(widgetsHeights, function(i, v) {
       var dragNDrop,
@@ -169,11 +169,12 @@
         index: i
       };
 
-      dragNDrop = window.createDragNDrop($container, $widget, $('.dragarea', $widget), $wrapper);
+      $container.append($widget);
+
+      dragNDrop = window.createDragNDrop($container, $widget, $('.dragarea', $widget), $wrapper, scale);
       dragNDrop.setHandler(createDragNDropHandler(widgets[i]));
       dragNDrop.init();
 
-      $container.append($widget);
     });
     positionWidgets();
 
@@ -204,7 +205,8 @@
         case 'touch':
           break;
         case 'transform':
-          tmp = ev.gesture.scale * containerScale;
+          console.log(tmp);
+          tmp = ev.gesture.scale * scale.scale;
           min = $wrapper.width() / $container.width();
           if (tmp > 1) {
             tmp = 1;
@@ -217,7 +219,7 @@
           containerNextScale = tmp;
           break;
         case 'release':
-          containerScale = containerNextScale;
+          scale.scale = containerNextScale;
           break;
       }
     });
