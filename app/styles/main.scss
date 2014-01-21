@@ -22,7 +22,6 @@ $margin: 15;
 
 #wrapper {
   width: 100%;
-  overflow-x: auto;
   overflow-y: hidden;
 }
 
@@ -33,14 +32,14 @@ $margin: 15;
 }
 
 body {
-  padding: 0px;
+  padding: unquote($margin + 'px');
 }
 
 #head {
-  with: 100%;
+  width: 100%;
   background-color: #B80000;
   height: 50px;
-  margin: 15px 15px 0 15px;
+  margin-bottom: unquote($margin + 'px');
 }
 
 .widget {

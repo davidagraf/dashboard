@@ -46,7 +46,7 @@
     widgets.sort(widgetsSorter);
 
     $.each(free, function(i) {
-      free[i] = MARGIN;
+      free[i] = 0;
     });
 
     $.each(widgets, function(i, widget) {
@@ -71,7 +71,7 @@
 
         widget.dom.css({
           top: minTop,
-          left: MARGIN + minCol * (COLUMN_WIDTH + MARGIN)
+          left: minCol * (COLUMN_WIDTH + MARGIN)
         });
 
         widget.top = minTop;
