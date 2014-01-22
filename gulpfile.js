@@ -7,9 +7,7 @@ var gulp = require('gulp'),
     tinylr = require('tiny-lr'),
     sass = require('gulp-sass'),
     jshint = require('gulp-jshint'),
-    jscs = require('gulp-jscs'),
-    ignore = require('gulp-ignore'),
-    rimraf = require('gulp-rimraf');
+    jscs = require('gulp-jscs');
 
 var createServers = function(port, lrport) {
   var lr = tinylr();

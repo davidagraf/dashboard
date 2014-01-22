@@ -112,10 +112,7 @@
           top2 = 0;
           widget.index = -1;
           for (i = widgets.length - 1; i >= 0; --i) {
-            if (
-                widgets[i].index >= 0 &&
-                (col <= widgets[i].col && col + widget.width > widgets[i].col ||
-                  widgets[i].col <= col && widgets[i].col + widgets[i].width > col)) {
+            if (widgets[i].index >= 0 && overlappingCols(widget, widgets[i])) {
               tmp = widgets[i].top + widgets[i].dom.height();
               if (tmp > y && widgets[i].top < top1) {
                 top1 = widgets[i].top;
@@ -123,10 +120,7 @@
             }
           }
           for (i = 0; i < widgets.length; ++i) {
-            if (
-                widgets[i].index >= 0 &&
-                (col <= widgets[i].col && col + widget.width > widgets[i].col ||
-                  widgets[i].col <= col && widgets[i].col + widgets[i].width > col)) {
+            if (widgets[i].index >= 0 && overlappingCols(widget, widgets[i])) {
               tmp = widgets[i].top + widgets[i].dom.height();
               if (tmp < y && tmp + MARGIN > top2) {
                 top2 = tmp + MARGIN;
