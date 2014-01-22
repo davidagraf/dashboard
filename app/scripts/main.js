@@ -15,16 +15,8 @@
       math = mathjs(),
       scale = {scale: 1},
       verticalWidgetSpace = 0,
+      NR_OF_COLUMNS = 5,
  
-  computeNrOfColumns = function() {
-    var nr = Math.floor(($container.width() + MARGIN) / (COLUMN_WIDTH + MARGIN));
-    if (nr < 1) {
-      nr = 1;
-    }
-    return nr;
-  },
-  nrOfColumns = computeNrOfColumns(),
-
   overlappingCols = function(widget1, widget2) {
     return (widget1.col <= widget2.col && widget1.col + widget1.width > widget2.col) ||
            (widget2.col <= widget1.col && widget2.col + widget2.width > widget1.col);
@@ -41,7 +33,7 @@
   },
 
   positionWidgets = function() {
-    var free = new Array(nrOfColumns);
+    var free = new Array(NR_OF_COLUMNS);
 
     widgets.sort(widgetsSorter);
 
@@ -60,7 +52,7 @@
         } else {
           minCol = 0;
           minTop = math.max(free.slice(minCol, minCol + widget.width));
-          for (j = 1; j < nrOfColumns - (widget.width - 1); ++j) {
+          for (j = 1; j < NR_OF_COLUMNS - (widget.width - 1); ++j) {
             top = math.max(free.slice(j, j + widget.width));
             if (top < minTop) {
               minCol = j;
@@ -110,8 +102,8 @@
           col = math.floor( (x + COLUMN_WIDTH / 2) / (COLUMN_WIDTH + MARGIN));
           if (col < 0) {
             col = 0;
-          } else if (col > (nrOfColumns - widget.width)) {
-            col = nrOfColumns - widget.width;
+          } else if (col > (NR_OF_COLUMNS - widget.width)) {
+            col = NR_OF_COLUMNS - widget.width;
           }
           
           // search new position
@@ -178,14 +170,6 @@
 
     });
     positionWidgets();
-
-    $(window).resize(function() {
-      var curColumns = computeNrOfColumns();
-      if (curColumns !== nrOfColumns) {
-        nrOfColumns = curColumns;
-        positionWidgets();
-      }
-    });
 
     //zoom
     var hammertime = $container.hammer({
