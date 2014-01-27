@@ -165,52 +165,6 @@
     });
     positionWidgets();
 
-    //zoom
-    var hammertime = $container.hammer({
-      'transform_always_block': true,
-      'transform_min_scale': 1,
-      'drag_block_horizontal': false,
-      'drag_block_vertical': false,
-      'drag_min_distance': 0
-    });
-
-    hammertime.on('transform touch release', function(ev) {
-      var tmp, min;
-      switch(ev.type) {
-        case 'touch':
-          initScrollLeft = $wrapper.scrollLeft();
-          initScrollTop = $(document).scrollTop();
-          touchX = ev.gesture.center.pageX;
-          touchY = ev.gesture.center.pageY - headHeight;
-          break;
-        case 'transform':
-          tmp = ev.gesture.scale * scale.scale;
-          min = $wrapper.width() / $container.width();
-          if (tmp > 1) {
-            tmp = 1;
-          } else if (tmp < min) {
-            tmp = min;
-          }
-          $container.css(
-            '-webkit-transform',
-            'scale('+ containerNextScale + ', ' + tmp + ')');
-          containerNextScale = tmp;
-
-          $container.height(verticalWidgetSpace*containerNextScale);
-
-          tmp = touchX * containerNextScale / scale.scale - touchX + initScrollLeft;
-          $wrapper.scrollLeft(tmp);
-
-          tmp = touchY * containerNextScale / scale.scale - touchY + initScrollTop;
-          $(document).scrollTop(tmp);
-
-          break;
-        case 'release':
-          scale.scale = containerNextScale;
-          break;
-      }
-    });
-
   });
 
 })();
