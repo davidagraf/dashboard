@@ -9,10 +9,8 @@
       MARGIN = 15,
       ROW_HEIGHT = 100,
       $container = $('#container'),
-      $wrapper = $('#wrapper'),
       widgets = new Array(widgetsHeights.length),
       math = mathjs(),
-      scale = {scale: 1},
       verticalWidgetSpace = 0,
       NR_OF_COLUMNS = 5,
  
@@ -77,7 +75,7 @@
     });
 
     verticalWidgetSpace = math.max(free);
-    $container.height(verticalWidgetSpace*scale.scale);
+    $container.height(verticalWidgetSpace);
 
   },
   
@@ -165,7 +163,7 @@
 
       $container.append($widget);
 
-      dragNDrop = window.createDragNDrop($container, $widget, $('.dragarea', $widget), $wrapper, scale);
+      dragNDrop = window.createDragNDrop($container, $widget, $('.dragarea', $widget));
       dragNDrop.setHandler(createDragNDropHandler(widgets[i]));
       dragNDrop.init();
 

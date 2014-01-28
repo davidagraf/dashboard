@@ -4,12 +4,12 @@
 
 (function() {
 
-  window.createDragNDrop = function(container, widget, dragArea, scrollArea, scale) {
+  window.createDragNDrop = function(container, widget, dragArea) {
     var
     that, // instance created by this factory
     DOCUMENT = jQuery(document), // jQuery Document object
     originX, originY, // position of widget before dragging
-    initScroll, lastScroll,
+    initScroll = 0, lastScroll = 0,
     baseMouseX, baseMouseY, // position of mouse/touch before dragging
     mouseX, mouseY, // current position of mouse/touch
     containerX, containerY, containerWidth, containerHeight, // properties of container
@@ -21,6 +21,7 @@
     SCROLL_PROC,
     SCROLL_X = 0,
     SCROLL_Y = 0,
+    scrollArea = $(document),
 
 
     getWidgetXInt = function() {
@@ -32,7 +33,7 @@
         pos = containerWidth-widgetWidth;
       }
 
-      return pos/scale.scale;
+      return pos;
     },
 
     getWidgetYInt = function() {
@@ -42,7 +43,7 @@
         pos = 0;
       }
 
-      return pos/scale.scale;
+      return pos;
     },
 
     doScroll = function(x,y) {
@@ -50,7 +51,6 @@
         SCROLL_X = x;
         SCROLL_Y = y;
         if (SCROLL_PROC) {
-          console.log('clear');
           clearInterval(SCROLL_PROC);
           SCROLL_PROC = undefined;
         }
@@ -148,10 +148,10 @@
      * Stores properties of container and widget before dragging.
      */
     prepareForDrag = function() {
-      if (scrollArea) {
-        initScroll = lastScroll = scrollArea.scrollLeft();
-        scrollArea.on('scroll', scrollHandler);
-      }
+      //if (scrollArea) {
+      //  initScroll = lastScroll = scrollArea.scrollLeft();
+      //  scrollArea.on('scroll', scrollHandler);
+      //}
       containerX = container.offset().left;
       containerY = container.offset().top;
       containerWidth = container.width();
