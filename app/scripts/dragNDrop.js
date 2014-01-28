@@ -9,7 +9,6 @@
     that, // instance created by this factory
     DOCUMENT = jQuery(document), // jQuery Document object
     originX, originY, // position of widget before dragging
-    initScroll = 0, lastScroll = 0,
     baseMouseX, baseMouseY, // position of mouse/touch before dragging
     mouseX, mouseY, // current position of mouse/touch
     containerX, containerY, containerWidth, containerHeight, // properties of container
@@ -17,15 +16,16 @@
     handler = {}, // callbacks from outside
     hammertime,
     SCROLL_SPACE = 20,
-    SCROLL_FACTOR = 5,
+    SCROLL_FACTOR = 25,
     SCROLL_PROC,
     SCROLL_X = 0,
     SCROLL_Y = 0,
-    scrollArea = $(document),
+    scrolledX = 0,
+    scrolledY = 0,
 
 
     getWidgetXInt = function() {
-      var pos = originX + (lastScroll - initScroll) + (mouseX - baseMouseX);
+      var pos = originX + scrolledX + (mouseX - baseMouseX);
 
       if (pos < 0) {
         pos = 0;
@@ -37,7 +37,7 @@
     },
 
     getWidgetYInt = function() {
-      var pos = originY + (mouseY - baseMouseY);
+      var pos = originY + scrolledY + (mouseY - baseMouseY);
 
       if (pos < 0) {
         pos = 0;
@@ -46,18 +46,40 @@
       return pos;
     },
 
+    positionWidget = function() {
+      widget.css({
+        left: getWidgetXInt() + 'px',
+        top: getWidgetYInt() + 'px'
+      });
+    },
+
+    killScroll = function() {
+      if (SCROLL_PROC) {
+        clearInterval(SCROLL_PROC);
+        SCROLL_PROC = undefined;
+      }
+      SCROLL_X = SCROLL_Y = 0;
+      scrolledX = scrolledY = 0;
+    },
+
     doScroll = function(x,y) {
       if (SCROLL_X !== x || SCROLL_Y !== y) {
+        killScroll();
         SCROLL_X = x;
         SCROLL_Y = y;
-        if (SCROLL_PROC) {
-          clearInterval(SCROLL_PROC);
-          SCROLL_PROC = undefined;
-        }
         if (x !== 0 || y !== 0) {
           SCROLL_PROC = setInterval(function() {
+            var beforeX = $(window).scrollLeft(),
+                beforeY = $(window).scrollTop();
             window.scrollBy(SCROLL_FACTOR*x,SCROLL_FACTOR*y);
-          }, 10);
+            if (beforeX === $(window).scrollLeft() && beforeY === $(window).scrollTop()) {
+              killScroll();
+            } else {
+              scrolledX += (SCROLL_FACTOR * x);
+              scrolledY += (SCROLL_FACTOR * y);
+              positionWidget();
+            }
+          }, 50);
         }
       }
     },
@@ -71,6 +93,8 @@
           scrollX = 0,
           scrollY = 0;
 
+      killScroll();
+
       if (vpX >= 0 && vpX <= SCROLL_SPACE) {
         scrollX = -1;
       } else if (vpX >= ($(window).innerWidth() - SCROLL_SPACE) && vpX <= $(window).innerWidth()) {
@@ -82,18 +106,9 @@
         scrollY = 1;
       }
       doScroll(scrollX, scrollY);
-      widget.css({
-        left: getWidgetXInt() + 'px',
-        top: getWidgetYInt() + 'px'
-      });
+      positionWidget();
     },
 
-    scrollHandler = function(ev) {
-      lastScroll = scrollArea.scrollLeft();
-
-      drag(ev);
-    },
-    
     /**
      * Touch move callback
      */
@@ -118,9 +133,7 @@
      * Common drop code
      */
     drop = function() {
-      if (scrollArea) {
-        scrollArea.unbind('scroll', scrollHandler);
-      }
+      killScroll();
       if (handler.prepareForDrop) {
         handler.prepareForDrop(that);
       }
@@ -148,10 +161,6 @@
      * Stores properties of container and widget before dragging.
      */
     prepareForDrag = function() {
-      //if (scrollArea) {
-      //  initScroll = lastScroll = scrollArea.scrollLeft();
-      //  scrollArea.on('scroll', scrollHandler);
-      //}
       containerX = container.offset().left;
       containerY = container.offset().top;
       containerWidth = container.width();
