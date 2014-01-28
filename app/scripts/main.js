@@ -10,7 +10,6 @@
       ROW_HEIGHT = 100,
       $container = $('#container'),
       $wrapper = $('#wrapper'),
-      headHeight = $('#head').height(),
       widgets = new Array(widgetsHeights.length),
       math = mathjs(),
       scale = {scale: 1},
@@ -137,7 +136,15 @@
   };
 
   $(function() {
-    var containerNextScale = scale.scale, initScrollLeft, initScrollTop, touchX, touchY;
+    $(window).scroll(function(){
+      var scrollTop = $(this).scrollTop();
+      if (scrollTop < 0) {
+        scrollTop = 0;
+      }
+      $('#head').css({
+        top: -scrollTop + 15
+      });
+    });
 
     $.each(widgetsHeights, function(i, v) {
       var dragNDrop,

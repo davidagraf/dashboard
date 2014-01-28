@@ -20,27 +20,28 @@ $margin: 15;
   -webkit-user-select: none;
 }
 
-#wrapper, #head {
+#head {
   width: width(3);
+  position: fixed;
+  background-color: #B80000;
+  height: 50px;
+  margin-bottom: unquote($margin + 'px');
 }
 
 @media (min-width: 1370px) {
-  #wrapper, #head {
+  #head {
     width: width(4);
   }
 }
 
 @media (min-width: 1705px) {
-  #wrapper, #head {
+  #head {
     width: width(5);
   }
 }
 
-#wrapper {
-  overflow-y: hidden;
-}
-
 #container {
+  margin-top: 75px;
   width: unquote(5 * ($widget-width + $margin) + $margin + 'px');
   position: relative;
   -webkit-transform-origin: 0px 0px;
@@ -48,12 +49,6 @@ $margin: 15;
 
 body {
   padding: unquote($margin + 'px');
-}
-
-#head {
-  background-color: #B80000;
-  height: 50px;
-  margin-bottom: unquote($margin + 'px');
 }
 
 .widget {

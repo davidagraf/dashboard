@@ -16,6 +16,12 @@
     widgetWidth, // width of widget
     handler = {}, // callbacks from outside
     hammertime,
+    SCROLL_SPACE = 20,
+    SCROLL_FACTOR = 5,
+    SCROLL_PROC,
+    SCROLL_X = 0,
+    SCROLL_Y = 0,
+
 
     getWidgetXInt = function() {
       var pos = originX + (lastScroll - initScroll) + (mouseX - baseMouseX);
@@ -39,10 +45,43 @@
       return pos/scale.scale;
     },
 
+    doScroll = function(x,y) {
+      if (SCROLL_X !== x || SCROLL_Y !== y) {
+        SCROLL_X = x;
+        SCROLL_Y = y;
+        if (SCROLL_PROC) {
+          console.log('clear');
+          clearInterval(SCROLL_PROC);
+          SCROLL_PROC = undefined;
+        }
+        if (x !== 0 || y !== 0) {
+          SCROLL_PROC = setInterval(function() {
+            window.scrollBy(SCROLL_FACTOR*x,SCROLL_FACTOR*y);
+          }, 10);
+        }
+      }
+    },
+
     /**
      * Moves the widget.
      */
     drag = function(/*ev*/) {
+      var vpX = event.clientX,
+          vpY = event.clientY,
+          scrollX = 0,
+          scrollY = 0;
+
+      if (vpX >= 0 && vpX <= SCROLL_SPACE) {
+        scrollX = -1;
+      } else if (vpX >= ($(window).innerWidth() - SCROLL_SPACE) && vpX <= $(window).innerWidth()) {
+        scrollX = 1;
+      }
+      if (vpY >= 0 && vpY <= SCROLL_SPACE) {
+        scrollY = -1;
+      } else if (vpY >= ($(window).innerHeight() - SCROLL_SPACE) && vpY <= $(window).innerHeight()) {
+        scrollY = 1;
+      }
+      doScroll(scrollX, scrollY);
       widget.css({
         left: getWidgetXInt() + 'px',
         top: getWidgetYInt() + 'px'
