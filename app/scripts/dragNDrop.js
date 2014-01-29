@@ -15,7 +15,7 @@
     widgetWidth, // width of widget
     handler = {}, // callbacks from outside
     hammertime,
-    SCROLL_SPACE = 20,
+    SCROLL_SPACE = 100,
     SCROLL_FACTOR = 25,
     SCROLL_PROC,
     SCROLL_X = 0,
@@ -59,7 +59,6 @@
         SCROLL_PROC = undefined;
       }
       SCROLL_X = SCROLL_Y = 0;
-      scrolledX = scrolledY = 0;
     },
 
     doScroll = function(x,y) {
@@ -87,22 +86,20 @@
     /**
      * Moves the widget.
      */
-    drag = function(/*ev*/) {
-      var vpX = event.clientX,
-          vpY = event.clientY,
-          scrollX = 0,
+    drag = function(absoluteX, absoluteY, screenX, screenY) {
+      var scrollX = 0,
           scrollY = 0;
 
       killScroll();
 
-      if (vpX >= 0 && vpX <= SCROLL_SPACE) {
+      if (absoluteX <= SCROLL_SPACE) {
         scrollX = -1;
-      } else if (vpX >= ($(window).innerWidth() - SCROLL_SPACE) && vpX <= $(window).innerWidth()) {
+      } else if (absoluteX >= (screenX - SCROLL_SPACE)) {
         scrollX = 1;
       }
-      if (vpY >= 0 && vpY <= SCROLL_SPACE) {
+      if (absoluteY <= SCROLL_SPACE) {
         scrollY = -1;
-      } else if (vpY >= ($(window).innerHeight() - SCROLL_SPACE) && vpY <= $(window).innerHeight()) {
+      } else if (absoluteY >= (screenY - SCROLL_SPACE)) {
         scrollY = 1;
       }
       doScroll(scrollX, scrollY);
@@ -115,8 +112,12 @@
     touchDrag = function(ev) {
       mouseX = baseMouseX + ev.gesture.deltaX;
       mouseY = baseMouseY + ev.gesture.deltaY;
-      
-      drag(ev);
+
+      drag(
+        ev.gesture.center.pageX, 
+        ev.gesture.center.pageY, 
+        window.innerWidth, window.innerHeight
+      );
     },
     
     /**
@@ -125,8 +126,10 @@
     mouseDrag = function(ev) {
       mouseX = ev.pageX;
       mouseY = ev.pageY;
+
+      scrolledX = scrolledY = 0;
       
-      drag(ev);
+      drag(ev.clientX, ev.clientY, $(window).innerWidth(), $(window).innerHeight());
     },
     
     /**

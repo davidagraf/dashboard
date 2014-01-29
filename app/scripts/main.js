@@ -12,7 +12,16 @@
       widgets = new Array(widgetsHeights.length),
       math = mathjs(),
       verticalWidgetSpace = 0,
-      NR_OF_COLUMNS = 5,
+
+  computeNrOfColumns = function() {
+    var nr = Math.floor(($container.width() + MARGIN) / (COLUMN_WIDTH + MARGIN));
+    if (nr < 1) {
+      nr = 1;
+    }
+    return nr;
+  },
+
+  NR_OF_COLUMNS = computeNrOfColumns(),
  
   overlappingCols = function(widget1, widget2) {
     return (widget1.col <= widget2.col && widget1.col + widget1.width > widget2.col) ||
@@ -43,7 +52,7 @@
 
       if (!widget.dom.hasClass('dragging')) {
 
-        if (widget.col >= 0) {
+        if (widget.col >= 0 && (widget.col + widget.width) <= NR_OF_COLUMNS) {
           minCol = widget.col;
           minTop = math.max(free.slice(minCol, minCol + widget.width));
         } else {
