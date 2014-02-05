@@ -33,24 +33,25 @@
   verticalWidgetSpace = 0,
   posUpdated = false,
 
-  computeNrOfColumns = function($div) {
-    var nr = Math.floor(($div.width() + MARGIN) / (COLUMN_WIDTH + MARGIN));
-    if (nr < 1) {
-      nr = 1;
+  nrOfColumns = function() {
+    var nr;
+
+    if (posUpdated) {
+      return 5;
+    }
+
+    nr = Math.floor(($('body').width() + MARGIN) / (COLUMN_WIDTH + MARGIN));
+    if (nr < 3) {
+      nr = 3;
+    } else if (nr > 5) {
+      nr = 5;
     }
     return nr;
   },
 
-
-  nrOfColumns = function() {
-    if (posUpdated) {
-      return computeNrOfColumns($container);
-    }
-    return computeNrOfColumns($('body'));
-  },
-
   prepPositionUpdate = function() {
     posUpdated = true;
+    $container.width(5*COLUMN_WIDTH + 4*MARGIN);
     curNrOfColumns = nrOfColumns();
   },
 
