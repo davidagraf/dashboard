@@ -3,32 +3,75 @@
 'use strict';
 
 (function() {
-  var widgetsHeights = [3,2,2,1,1,2,3,1,2,4,2,4,3,2,1,2,1,1,3,3,1,2,3],
-      widgetsWidths =  [1,1,2,1,1,1,1,2,1,1,1,1,3,1,1,1,1,2,1,1,1,1,1],
-      COLUMN_WIDTH = 320,
-      MARGIN = 15,
-      ROW_HEIGHT = 100,
-      $container = $('#container'),
-      widgets = new Array(widgetsHeights.length),
-      math = mathjs(),
-      verticalWidgetSpace = 0,
+  var
 
-  computeNrOfColumns = function() {
-    var nr = Math.floor(($container.width() + MARGIN) / (COLUMN_WIDTH + MARGIN));
+  genMeta = function(width, height, col, top) {
+    return {
+      width: width,
+      height: height,
+      col: col,
+      top: top
+    };
+  },
+
+  widgets = [
+    // genMeta(height, with, col, top)
+    genMeta(1, 1, 0, 1),
+    genMeta(2, 2, 1, 2),
+    genMeta(1, 2, 2, 3),
+    genMeta(1, 3, 3, 4),
+    genMeta(1, 3, 4, 5),
+    genMeta(1, 2, 0, 6),
+    genMeta(1, 3, 1, 7),
+    genMeta(1, 1, 2, 8)
+  ],
+  COLUMN_WIDTH = 320,
+  MARGIN = 15,
+  ROW_HEIGHT = 100,
+  $container = $('#container'),
+  math = mathjs(),
+  verticalWidgetSpace = 0,
+  posUpdated = false,
+
+  computeNrOfColumns = function($div) {
+    var nr = Math.floor(($div.width() + MARGIN) / (COLUMN_WIDTH + MARGIN));
     if (nr < 1) {
       nr = 1;
     }
     return nr;
   },
 
-  NR_OF_COLUMNS = computeNrOfColumns(),
- 
+
+  nrOfColumns = function() {
+    if (posUpdated) {
+      return computeNrOfColumns($container);
+    }
+    return computeNrOfColumns($('body'));
+  },
+
+  prepPositionUpdate = function() {
+    posUpdated = true;
+    curNrOfColumns = nrOfColumns();
+  },
+
+  curNrOfColumns = nrOfColumns(),
+
   overlappingCols = function(widget1, widget2) {
     return (widget1.col <= widget2.col && widget1.col + widget1.width > widget2.col) ||
            (widget2.col <= widget1.col && widget2.col + widget2.width > widget1.col);
   },
 
+  inRange = function(a) {
+    return (a.col >= 0 && a.col < curNrOfColumns);
+  },
+
   widgetsSorter = function(a, b) {
+    if (!inRange(a) && inRange(b)) {
+      return 1;
+    }
+    if (inRange(a) && !inRange(b)) {
+      return -1;
+    }
     if (a.top !== b.top) {
       return a.top - b.top;
     } else if (!overlappingCols(a,b)) {
@@ -38,8 +81,8 @@
     }
   },
 
-  positionWidgets = function() {
-    var free = new Array(NR_OF_COLUMNS);
+  positionWidgets = function(save) {
+    var free = new Array(curNrOfColumns);
 
     widgets.sort(widgetsSorter);
 
@@ -52,13 +95,13 @@
 
       if (!widget.dom.hasClass('dragging')) {
 
-        if (widget.col >= 0 && (widget.col + widget.width) <= NR_OF_COLUMNS) {
+        if (widget.col >= 0 && (widget.col + widget.width) <= curNrOfColumns) {
           minCol = widget.col;
           minTop = math.max(free.slice(minCol, minCol + widget.width));
         } else {
           minCol = 0;
           minTop = math.max(free.slice(minCol, minCol + widget.width));
-          for (j = 1; j < NR_OF_COLUMNS - (widget.width - 1); ++j) {
+          for (j = 1; j < curNrOfColumns - (widget.width - 1); ++j) {
             top = math.max(free.slice(j, j + widget.width));
             if (top < minTop) {
               minCol = j;
@@ -72,9 +115,11 @@
           left: minCol * (COLUMN_WIDTH + MARGIN)
         });
 
-        widget.top = minTop;
-        widget.col = minCol;
-        widget.index = i;
+        if (save) {
+          widget.top = minTop;
+          widget.col = minCol;
+          widget.index = i;
+        }
 
         for (k = 0; k < widget.width; ++k) {
           free[minCol + k] = (MARGIN + minTop + widget.dom.height());
@@ -95,7 +140,8 @@
         offset = widget.dom.offset();
         widget.dom.addClass('dragging');
         $('body').addClass('noselect');
-        positionWidgets();
+        positionWidgets(true);
+        prepPositionUpdate();
       },
       prepareForDrop: function(dragNDrop) {
         var x = dragNDrop.getWidgetX(),
@@ -108,8 +154,8 @@
           col = math.floor( (x + COLUMN_WIDTH / 2) / (COLUMN_WIDTH + MARGIN));
           if (col < 0) {
             col = 0;
-          } else if (col > (NR_OF_COLUMNS - widget.width)) {
-            col = NR_OF_COLUMNS - widget.width;
+          } else if (col > (curNrOfColumns - widget.width)) {
+            col = curNrOfColumns - widget.width;
           }
           
           // search new position
@@ -136,7 +182,7 @@
 
           widget.top = (top1 < top2 ? top1 : top2);
 
-          positionWidgets();
+          positionWidgets(true);
         }
       }
     };
@@ -153,22 +199,16 @@
       });
     });
 
-    $.each(widgetsHeights, function(i, v) {
+    $.each(widgets, function(i, v) {
       var dragNDrop,
           $widget = $(
             '<div class="widget"><div class="dragarea"><p>' + i + '</p></div><div class="info"/></div>'
           );
 
-      $widget.height(ROW_HEIGHT * v);
-      $widget.attr('data-width', widgetsWidths[i]);
-      widgets[i] = {
-        name: i,
-        dom: $widget,
-        width: widgetsWidths[i],
-        top: Infinity,
-        col: -1,
-        index: i
-      };
+      $widget.height(ROW_HEIGHT * v.height);
+      $widget.attr('data-width', v.width);
+      v.name = i;
+      v.dom = $widget;
 
       $container.append($widget);
 
@@ -178,6 +218,18 @@
 
     });
     positionWidgets();
+
+    $(window).resize(function() {
+      var tmp;
+      if (!posUpdated) {
+        tmp = nrOfColumns();
+        if (tmp !== curNrOfColumns) {
+          curNrOfColumns = tmp;
+          positionWidgets();
+        }
+      }
+
+    });
 
   });
 

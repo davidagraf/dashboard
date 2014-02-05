@@ -114,8 +114,8 @@
       mouseY = baseMouseY + ev.gesture.deltaY;
 
       drag(
-        ev.gesture.center.pageX, 
-        ev.gesture.center.pageY, 
+        ev.gesture.center.pageX,
+        ev.gesture.center.pageY,
         window.innerWidth, window.innerHeight
       );
     },
