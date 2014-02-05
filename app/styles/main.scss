@@ -31,7 +31,7 @@ $nr-of-columns: 5;
 
 #container {
   margin-top: 75px;
-  width: #{$nr-of-columns * ($widget-width + $margin) + $margin}px;
+  width: 100%;
   position: relative;
   -webkit-transform-origin: 0px 0px;
 }

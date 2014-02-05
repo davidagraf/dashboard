@@ -166,8 +166,6 @@
     prepareForDrag = function() {
       containerX = container.offset().left;
       containerY = container.offset().top;
-      containerWidth = container.width();
-      containerHeight = container.height();
       
       originX = widget.offset().left - containerX;
       originY = widget.offset().top - containerY;
@@ -175,6 +173,9 @@
       if (handler.prepareForDrag) {
         handler.prepareForDrag(that);
       }
+
+      containerWidth = container.width();
+      containerHeight = container.height();
     },
     
     /**
