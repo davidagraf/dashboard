@@ -4,21 +4,28 @@
 
 (function() {
 
-  window.createDragNDrop = function(container, widget, dragArea, scrollArea, scale) {
+  window.createDragNDrop = function(container, widget, dragArea) {
     var
     that, // instance created by this factory
     DOCUMENT = jQuery(document), // jQuery Document object
     originX, originY, // position of widget before dragging
-    initScroll, lastScroll,
     baseMouseX, baseMouseY, // position of mouse/touch before dragging
     mouseX, mouseY, // current position of mouse/touch
     containerX, containerY, containerWidth, containerHeight, // properties of container
     widgetWidth, // width of widget
     handler = {}, // callbacks from outside
     hammertime,
+    SCROLL_SPACE = 100,
+    SCROLL_FACTOR = 25,
+    SCROLL_PROC,
+    SCROLL_X = 0,
+    SCROLL_Y = 0,
+    scrolledX = 0,
+    scrolledY = 0,
+
 
     getWidgetXInt = function() {
-      var pos = originX + (lastScroll - initScroll) + (mouseX - baseMouseX);
+      var pos = originX + scrolledX + (mouseX - baseMouseX);
 
       if (pos < 0) {
         pos = 0;
@@ -26,43 +33,91 @@
         pos = containerWidth-widgetWidth;
       }
 
-      return pos/scale.scale;
+      return pos;
     },
 
     getWidgetYInt = function() {
-      var pos = originY + (mouseY - baseMouseY);
+      var pos = originY + scrolledY + (mouseY - baseMouseY);
 
       if (pos < 0) {
         pos = 0;
       }
 
-      return pos/scale.scale;
+      return pos;
     },
 
-    /**
-     * Moves the widget.
-     */
-    drag = function(/*ev*/) {
+    positionWidget = function() {
       widget.css({
         left: getWidgetXInt() + 'px',
         top: getWidgetYInt() + 'px'
       });
     },
 
-    scrollHandler = function(ev) {
-      lastScroll = scrollArea.scrollLeft();
-
-      drag(ev);
+    killScroll = function() {
+      if (SCROLL_PROC) {
+        clearInterval(SCROLL_PROC);
+        SCROLL_PROC = undefined;
+      }
+      SCROLL_X = SCROLL_Y = 0;
     },
-    
+
+    doScroll = function(x,y) {
+      if (SCROLL_X !== x || SCROLL_Y !== y) {
+        killScroll();
+        SCROLL_X = x;
+        SCROLL_Y = y;
+        if (x !== 0 || y !== 0) {
+          SCROLL_PROC = setInterval(function() {
+            var beforeX = $(window).scrollLeft(),
+                beforeY = $(window).scrollTop();
+            window.scrollBy(SCROLL_FACTOR*x,SCROLL_FACTOR*y);
+            if (beforeX === $(window).scrollLeft() && beforeY === $(window).scrollTop()) {
+              killScroll();
+            } else {
+              scrolledX += (SCROLL_FACTOR * x);
+              scrolledY += (SCROLL_FACTOR * y);
+              positionWidget();
+            }
+          }, 50);
+        }
+      }
+    },
+
+    /**
+     * Moves the widget.
+     */
+    drag = function(absoluteX, absoluteY, screenX, screenY) {
+      var scrollX = 0,
+          scrollY = 0;
+
+      killScroll();
+
+      if (absoluteX <= SCROLL_SPACE) {
+        scrollX = -1;
+      } else if (absoluteX >= (screenX - SCROLL_SPACE)) {
+        scrollX = 1;
+      }
+      if (absoluteY <= SCROLL_SPACE) {
+        scrollY = -1;
+      } else if (absoluteY >= (screenY - SCROLL_SPACE)) {
+        scrollY = 1;
+      }
+      doScroll(scrollX, scrollY);
+      positionWidget();
+    },
+
     /**
      * Touch move callback
      */
     touchDrag = function(ev) {
       mouseX = baseMouseX + ev.gesture.deltaX;
       mouseY = baseMouseY + ev.gesture.deltaY;
-      
-      drag(ev);
+
+      drag(
+        ev.gesture.center.pageX,
+        ev.gesture.center.pageY,
+        window.innerWidth, window.innerHeight
+      );
     },
     
     /**
@@ -71,17 +126,17 @@
     mouseDrag = function(ev) {
       mouseX = ev.pageX;
       mouseY = ev.pageY;
+
+      scrolledX = scrolledY = 0;
       
-      drag(ev);
+      drag(ev.clientX, ev.clientY, $(window).innerWidth(), $(window).innerHeight());
     },
     
     /**
      * Common drop code
      */
     drop = function() {
-      if (scrollArea) {
-        scrollArea.unbind('scroll', scrollHandler);
-      }
+      killScroll();
       if (handler.prepareForDrop) {
         handler.prepareForDrop(that);
       }
@@ -109,10 +164,6 @@
      * Stores properties of container and widget before dragging.
      */
     prepareForDrag = function() {
-      if (scrollArea) {
-        initScroll = lastScroll = scrollArea.scrollLeft();
-        scrollArea.on('scroll', scrollHandler);
-      }
       containerX = container.offset().left;
       containerY = container.offset().top;
       containerWidth = container.width();
