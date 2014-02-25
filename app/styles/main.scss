@@ -24,26 +24,26 @@ $nr-of-columns: 5;
 
 #head {
   width: width(3);
-  position: fixed;
   background-color: #B80000;
   height: 50px;
   margin-bottom: unquote($margin + 'px');
 }
 
 #container {
-  margin-top: 75px;
-  width: 100%;
+  margin-top: 30px;
   position: relative;
+  width: width(3);
+  overflow: hidden;
 }
 
 @media (min-width: 1370px) {
-  #head {
+  #head,#container {
     width: width(4);
   }
 }
 
 @media (min-width: 1705px) {
-  #head {
+  #head,#container {
     width: width(5);
   }
 }

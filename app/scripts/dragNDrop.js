@@ -18,14 +18,12 @@
     SCROLL_SPACE = 100,
     SCROLL_FACTOR = 25,
     SCROLL_PROC,
-    SCROLL_X = 0,
     SCROLL_Y = 0,
-    scrolledX = 0,
     scrolledY = 0,
 
 
     getWidgetXInt = function() {
-      var pos = originX + scrolledX + (mouseX - baseMouseX);
+      var pos = originX + (mouseX - baseMouseX);
 
       if (pos < 0) {
         pos = 0;
@@ -58,23 +56,20 @@
         clearInterval(SCROLL_PROC);
         SCROLL_PROC = undefined;
       }
-      SCROLL_X = SCROLL_Y = 0;
+      SCROLL_Y = 0;
     },
 
-    doScroll = function(x,y) {
-      if (SCROLL_X !== x || SCROLL_Y !== y) {
+    doScroll = function(y) {
+      if (SCROLL_Y !== y) {
         killScroll();
-        SCROLL_X = x;
         SCROLL_Y = y;
-        if (x !== 0 || y !== 0) {
+        if (y !== 0) {
           SCROLL_PROC = setInterval(function() {
-            var beforeX = $(window).scrollLeft(),
-                beforeY = $(window).scrollTop();
-            window.scrollBy(SCROLL_FACTOR*x,SCROLL_FACTOR*y);
-            if (beforeX === $(window).scrollLeft() && beforeY === $(window).scrollTop()) {
+            var beforeY = $(window).scrollTop();
+            window.scrollBy(0,SCROLL_FACTOR*y);
+            if (beforeY === $(window).scrollTop()) {
               killScroll();
             } else {
-              scrolledX += (SCROLL_FACTOR * x);
               scrolledY += (SCROLL_FACTOR * y);
               positionWidget();
             }
@@ -87,22 +82,13 @@
      * Moves the widget.
      */
     drag = function(absoluteX, absoluteY, screenX, screenY) {
-      var scrollX = 0,
-          scrollY = 0;
-
       killScroll();
 
-      if (absoluteX <= SCROLL_SPACE) {
-        scrollX = -1;
-      } else if (absoluteX >= (screenX - SCROLL_SPACE)) {
-        scrollX = 1;
-      }
       if (absoluteY <= SCROLL_SPACE) {
-        scrollY = -1;
+        doScroll(-1);
       } else if (absoluteY >= (screenY - SCROLL_SPACE)) {
-        scrollY = 1;
+        doScroll(1);
       }
-      doScroll(scrollX, scrollY);
       positionWidget();
     },
 
@@ -127,7 +113,7 @@
       mouseX = ev.pageX;
       mouseY = ev.pageY;
 
-      scrolledX = scrolledY = 0;
+      scrolledY = 0;
       
       drag(ev.clientX, ev.clientY, $(window).innerWidth(), $(window).innerHeight());
     },

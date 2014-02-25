@@ -32,13 +32,10 @@
   math = mathjs(),
   verticalWidgetSpace = 0,
   posUpdated = false,
+  swift = 0,
 
   nrOfColumns = function() {
     var nr;
-
-    if (posUpdated) {
-      return 5;
-    }
 
     nr = Math.floor(($('body').width() + MARGIN) / (COLUMN_WIDTH + MARGIN));
     if (nr < 3) {
@@ -51,8 +48,7 @@
 
   prepPositionUpdate = function() {
     posUpdated = true;
-    $container.width(5*COLUMN_WIDTH + 4*MARGIN);
-    curNrOfColumns = nrOfColumns();
+    curNrOfColumns = 5;
   },
 
   curNrOfColumns = nrOfColumns(),
@@ -64,6 +60,23 @@
 
   inRange = function(a) {
     return (a.col >= 0 && a.col < curNrOfColumns);
+  },
+
+  doSwift = function(x) {
+    var tmp;
+
+    if (!posUpdated) {
+      return;
+    }
+
+    tmp = swift + x;
+
+    if (tmp < 0 || tmp > (5 - nrOfColumns())) {
+      return;
+    }
+
+    swift = tmp;
+    positionWidgets();
   },
 
   widgetsSorter = function(a, b) {
@@ -113,7 +126,7 @@
 
         widget.dom.css({
           top: minTop,
-          left: minCol * (COLUMN_WIDTH + MARGIN)
+          left: (minCol - swift) * (COLUMN_WIDTH + MARGIN)
         });
 
         if (save) {
@@ -133,6 +146,10 @@
     $container.height(verticalWidgetSpace);
 
   },
+
+  mouseLeft = function(ev) {
+    console.log('mouseLeft');
+  },
   
   createDragNDropHandler = function(widget) {
     var offset, top1, top2;
@@ -143,6 +160,7 @@
         $('body').addClass('noselect');
         positionWidgets(true);
         prepPositionUpdate();
+        $container.on('mouseleave', mouseLeft);
       },
       prepareForDrop: function(dragNDrop) {
         var x = dragNDrop.getWidgetX(),
@@ -150,9 +168,10 @@
             col, i, tmp;
         widget.dom.removeClass('dragging');
         $('body').removeClass('noselect');
+        $container.unbind('mouseleave', mouseLeft);
 
         if (widgets.length > 1) {
-          col = math.floor( (x + COLUMN_WIDTH / 2) / (COLUMN_WIDTH + MARGIN));
+          col = math.floor( (x + COLUMN_WIDTH / 2) / (COLUMN_WIDTH + MARGIN)) + swift;
           if (col < 0) {
             col = 0;
           } else if (col > (curNrOfColumns - widget.width)) {
@@ -220,16 +239,27 @@
     });
     positionWidgets();
 
+    $('#left').click(function() {
+      doSwift(-1);
+    });
+    $('#right').click(function() {
+      doSwift(1);
+    });
+
     $(window).resize(function() {
       var tmp;
+      tmp = nrOfColumns();
       if (!posUpdated) {
-        tmp = nrOfColumns();
         if (tmp !== curNrOfColumns) {
           curNrOfColumns = tmp;
           positionWidgets();
         }
+      } else {
+        if (swift > (5 - nrOfColumns())) {
+          swift = 5 - nrOfColumns();
+          positionWidgets();
+        }
       }
-
     });
 
   });
