@@ -44,7 +44,7 @@ gulp.task('deploy', function() {
     .pipe(gulp.dest('dist/styles'));
   gulp.src('app/bower_components/modernizr/modernizer.js')
     .pipe(gulp.dest('dist/bower_components/modernizr'));
-  gulp.src('app/bower_components/jquery/jquery.js')
+  gulp.src('app/bower_components/jquery/dist/jquery.js')
     .pipe(gulp.dest('dist/bower_components/jquery'));
   gulp.src('app/bower_components/mathjs/dist/math.js')
     .pipe(gulp.dest('dist/bower_components/mathjs/dist'));

@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "dependencies": {
     "sass-bootstrap": "~3.0.2",
-    "modernizr": "~2.7.1",
-    "jquery": "~2.0.3",
-    "mathjs": "~0.17.1",
-    "hammerjs": "~1.0.6",
-    "jquery-hammerjs": "*"
+    "modernizr": "~2.7.2",
+    "jquery": "~2.1.0",
+    "mathjs": "~0.19.0",
+    "hammerjs": "~1.0.10",
+    "jquery-hammerjs": "1.0.6"
   },
   "devDependencies": {}
 }
