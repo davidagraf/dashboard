@@ -33,7 +33,7 @@ $nr-of-columns: 5;
   margin-top: 30px;
   position: relative;
   width: width(3);
-  overflow: hidden;
+  overflow: visible;
 }
 
 @media (min-width: 1370px) {
